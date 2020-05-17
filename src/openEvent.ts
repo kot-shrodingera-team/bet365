@@ -100,7 +100,7 @@ const checkCurrentEvent = (): boolean => {
   const workerTeamNames = getWorkerTeamNames();
   console.log(siteTeamNames);
   console.log(workerTeamNames);
-  if (compareTeamNames(siteTeamNames, workerTeamNames)) {
+  if (compareTeamNames(workerTeamNames, siteTeamNames)) {
     console.log(`Заголовок подходит`);
     return true;
   }
@@ -145,7 +145,7 @@ const getTeamNamesFromTeamStack = (
 //     if (teamStackTeamNames === null) {
 //       return null;
 //     }
-//     return compareTeamNames(teamStackTeamNames, normalizedWorkerTeamNames);
+//     return compareTeamNames(normalizedWorkerTeamNames, teamStackTeamNames);
 //   });
 
 //   if (!competition) {
@@ -296,7 +296,7 @@ const findEventInOverview = async (): Promise<Element> => {
     if (teamStackTeamNames === null) {
       return null;
     }
-    return compareTeamNames(teamStackTeamNames, workerTeamNames);
+    return compareTeamNames(workerTeamNames, teamStackTeamNames);
   });
 
   if (!competition) {

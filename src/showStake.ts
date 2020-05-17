@@ -22,6 +22,7 @@ export const clearReloadCount = (): void => {
 };
 
 const showStake = async (): Promise<void> => {
+  Locator.betSlipManager.deleteAllBets();
   console.log('showStake()');
   if (
     worker.GetSessionData &&

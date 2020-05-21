@@ -2,6 +2,7 @@ import {
   awaiter,
   fireEvent,
   getElement,
+  ri,
 } from '@kot-shrodingera-team/config/util';
 import {
   inPlayControlBarSelectedItemSelector,
@@ -14,7 +15,6 @@ import {
   overviewCompetitionSelector,
   overviewTeamStackTeamSelector,
 } from './selectors';
-import { ri } from './checkBet/util';
 
 export const getCurrentEventName = (): string => {
   const eventNameElement = document.querySelector(eventNameSelector);

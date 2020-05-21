@@ -1,24 +1,4 @@
-export const esc = (string: string): string => {
-  return string.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&');
-};
-
-export const ri = (
-  strings: TemplateStringsArray,
-  ...args: Array<string | RegExp>
-): RegExp => {
-  const rawStrings = strings.raw;
-  let result = rawStrings[0];
-  for (let i = 1; i < rawStrings.length; i += 1) {
-    let arg = args[i - 1];
-    if (typeof arg === 'object' && 'source' in arg) {
-      arg = arg.source;
-    } else {
-      arg = esc(arg);
-    }
-    result += arg + rawStrings[i];
-  }
-  return new RegExp(result, 'i');
-};
+import { ri } from '@kot-shrodingera-team/config/util';
 
 export const getTennisCompletedSetsCount = (): number => {
   const setScore = [

@@ -1,10 +1,9 @@
-import { caseInsensitiveCompare } from '@kot-shrodingera-team/config/util';
+import { caseInsensitiveCompare, ri } from '@kot-shrodingera-team/config/util';
 import { getSiteTeamNames } from '../openEvent';
 import {
   formatParameterRegex,
   getHandicapScoreOffset,
   parseParameter,
-  ri,
   getTennisCompletedSetsCount,
   getTennisCompletedSetsGamesCount,
 } from './util';
@@ -454,7 +453,8 @@ const getCheckOdd = (
         'Ставка на первую команду/игрока, но в купоне нет названия первой команды/игрока'
       );
     }
-  } else if (/(2|ML2|F2)/i.test(odd)) {
+  }
+  if (/(2|ML2|F2)/i.test(odd)) {
     if (!ri`${teamNames.teamTwo}`.test(betslipBetDescription)) {
       error(
         'Ставка на вторую команду/игрока, но в купоне нет названия второй команды/игрока'

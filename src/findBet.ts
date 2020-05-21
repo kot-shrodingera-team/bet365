@@ -17,8 +17,9 @@ const findBet = (): Participant => {
   let participants = [
     ...document.querySelectorAll(participantSelector),
   ] as Participant[];
+  const betId = worker.BetId.split('_')[0];
   let participant = participants.find(
-    (element) => element.wrapper.betslip_participantID() === worker.BetId
+    (element) => element.wrapper.betslip_participantID() === betId
   );
 
   if (!participant) {
@@ -38,7 +39,7 @@ const findBet = (): Participant => {
           ...marketGroup.querySelectorAll(participantSelector),
         ] as Participant[];
         participant = participants.find(
-          (element) => element.wrapper.betslip_participantID() === worker.BetId
+          (element) => element.wrapper.betslip_participantID() === betId
         );
         if (participant) {
           break;
@@ -59,8 +60,7 @@ const findBet = (): Participant => {
             ...marketGroup.querySelectorAll(participantSelector),
           ] as Participant[];
           participant = participants.find(
-            (element) =>
-              element.wrapper.betslip_participantID() === worker.BetId
+            (element) => element.wrapper.betslip_participantID() === betId
           );
           if (participant) {
             break;

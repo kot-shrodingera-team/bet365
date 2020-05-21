@@ -65,11 +65,7 @@ export const accountLimited = (): void => {
       worker.SetSessionData('Bet365 LimitedAccountInformed', '1');
     }
   }
-  if (
-    // worker.pauseOnLimitedAccount ||
-    worker.GetSessionData &&
-    worker.GetSessionData('pauseOnLimitedAccount') === 'true'
-  ) {
+  if (worker.PauseOnLimitedAccount) {
     if (worker.SetBookmakerPaused && worker.SetBookmakerPaused(true)) {
       const pauseMessage = 'Bet365 поставлен на паузу';
       worker.Helper.WriteLine(pauseMessage);

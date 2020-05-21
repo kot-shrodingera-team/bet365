@@ -67,6 +67,19 @@ const checkBet = (log = false): checkBetObject => {
     worker.Helper.WriteLine(`Маркет '${betslipBetDetails}'`);
     worker.Helper.WriteLine(`Ставка '${betslipBetDescription}'`);
     worker.Helper.WriteLine(`Роспись в боте '${worker.BetName}'`);
+    const {
+      market,
+      odd,
+      param,
+      period,
+      subperiod,
+      overtimeType,
+    } = worker.GetSessionData('dev')
+      ? (JSON.parse(worker.GetSessionData('ForkObj')) as WorkerBetObject)
+      : (JSON.parse(worker.ForkObj) as WorkerBetObject);
+    worker.Helper.WriteLine(
+      `market: ${market}, odd: ${odd}, param: ${param}, period: ${period}, subperiod: ${subperiod}, overtimeType: ${overtimeType}`
+    );
   }
 
   const checkMarket = getCheckMarket(betslipBetDetails);

@@ -33,6 +33,7 @@ const checkCouponLoading = (): boolean => {
   }
   const betslipHeaderText = document.querySelector(betslipHeaderTextSelector);
   if (betslipHeaderText && betslipHeaderText.textContent === 'Bet Placed') {
+    worker.Helper.WriteLine('Обработка ставки завершена (Bet Placed)');
     isBetPlacing = false;
     return false;
   }
@@ -43,6 +44,7 @@ const checkCouponLoading = (): boolean => {
     betslipPlaceBetButtonText &&
     betslipPlaceBetButtonText.textContent === 'Total Stake'
   ) {
+    worker.Helper.WriteLine('Обработка ставки завершена (Total Stake)');
     isBetPlacing = false;
     return false;
   }

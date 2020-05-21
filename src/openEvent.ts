@@ -61,8 +61,8 @@ const normalize = (string: string): string => {
   let result = string.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   // Заменяем дефисы и точки на пробелы
   result = result.replace(/[.-]/g, ' ');
-  // Убираем знаки восклицания
-  result = result.replace(/!/g, '');
+  // Убираем знаки восклицания и кавычки
+  result = result.replace(/!'/g, '');
   // Убираем лишние пробелы
   result = result.replace(/\s+/g, ' ').trim();
   return result;

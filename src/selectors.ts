@@ -87,3 +87,5 @@ export const betslipBetHandicapSelector = '.bss-NormalBetItem_Handicap';
 // export const betslipBetDetailsSelector = '.bs-Selection_Details';
 export const betslipBetDetailsSelector = '.bss-NormalBetItem_Market';
 export const betslipPlaceBetButtonTextSelector = '.bss-PlaceBetButton_Text';
+
+export const standardBetslipSelector = '.bss-StandardBetslip';

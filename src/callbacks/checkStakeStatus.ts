@@ -2,6 +2,7 @@ import {
   betslipHeaderTextSelector,
   // betslipDoneSelector,
   betslipPlaceBetButtonTextSelector,
+  standardBetslipSelector,
 } from '../selectors';
 import { checkRestriction, accountBlocked } from '../accountChecks';
 import { updateBalance } from '../getInfo';
@@ -13,7 +14,15 @@ const checkStakeStatus = (): boolean => {
   }
   const betslipHeaderText = document.querySelector(betslipHeaderTextSelector);
   if (betslipHeaderText && betslipHeaderText.textContent === 'Bet Placed') {
-    worker.Helper.WriteLine('Ставка принята');
+    const standardBetslip = document.querySelector(standardBetslipSelector);
+    if (
+      standardBetslip &&
+      ![...standardBetslip.classList].includes('bss-StandardBetslip-receipt')
+    ) {
+      worker.Helper.WriteLine('Ставка не принята (невидимая иконка)');
+      return false;
+    }
+    worker.Helper.WriteLine('Ставка принята (Bet Placed)');
     // const betslipDone = document.querySelector(
     //   betslipDoneSelector
     // ) as HTMLElement;

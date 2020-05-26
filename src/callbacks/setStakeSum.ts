@@ -22,9 +22,9 @@ const setStakeSum = (sum: number): boolean => {
   }
   worker.Helper.WriteLine(`Вводим сумму ставки: ${sum}`);
   const tempMaximumStake = getTempMaximumStake();
-  if (sum < tempMaximumStake) {
+  if (tempMaximumStake !== -1 && sum > tempMaximumStake) {
     worker.Helper.WriteLine(
-      `Сумма (${sum} меньше временного макса (${tempMaximumStake})`
+      `Сумма (${sum} больше временного макса (${tempMaximumStake})`
     );
     const difference = Number((sum - tempMaximumStake).toFixed(2));
     const newTempMaximumStake = Number(

@@ -94,6 +94,9 @@ export const getMinimumStake = (): number => {
 };
 
 export const getMaximumStake = (): number => {
+  if (tempMaximumStake !== -1) {
+    return tempMaximumStake;
+  }
   const betErrorMessageElement = document.querySelector(betslipAlertMessage);
   if (betErrorMessageElement) {
     const betErrorMessage = betErrorMessageElement.textContent.trim();
@@ -113,9 +116,6 @@ export const getMaximumStake = (): number => {
       tempMaximumStake = Number(matches[1]);
       return Number(matches[1]);
     }
-  }
-  if (tempMaximumStake !== -1) {
-    return tempMaximumStake;
   }
   return getBalance();
 };

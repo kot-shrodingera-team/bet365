@@ -4,6 +4,7 @@ import {
   betslipPlaceBetButtonTextSelector,
 } from '../selectors';
 import { checkRestriction, accountBlocked } from '../accountChecks';
+import { updateBalance } from '../getInfo';
 
 const checkStakeStatus = (): boolean => {
   if (checkRestriction()) {
@@ -19,6 +20,7 @@ const checkStakeStatus = (): boolean => {
     // if (betslipDone) {
     //   betslipDone.click();
     // }
+    updateBalance();
     return true;
   }
   const betslipPlaceBetButtonText = document.querySelector(
@@ -29,6 +31,7 @@ const checkStakeStatus = (): boolean => {
     betslipPlaceBetButtonText.textContent === 'Total Stake'
   ) {
     worker.Helper.WriteLine('Ставка принята (без иконки)');
+    updateBalance();
     return true;
   }
   worker.Helper.WriteLine('Ставка не принята');

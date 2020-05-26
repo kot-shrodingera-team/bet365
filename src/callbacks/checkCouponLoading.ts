@@ -5,6 +5,7 @@ import {
 } from '../selectors';
 import showStake from '../showStake';
 import { getStakeCount } from '../getInfo';
+import { checkRestriction, accountBlocked } from '../accountChecks';
 
 let sendMessageToTelegram = false;
 let doStakeCounter = 0;
@@ -24,6 +25,10 @@ export const setBetPlacing = (status: boolean): void => {
 
 const checkCouponLoading = (): boolean => {
   // worker.TakeScreenShot(true);
+  if (checkRestriction()) {
+    accountBlocked();
+    return false;
+  }
   const acceptButton = document.querySelector(
     betslipAcceptChangesButtonSelector
   );

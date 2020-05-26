@@ -5,11 +5,23 @@ import {
   betslipBetOddsSelector,
   betslipAlertMessage,
   betslipBetStakeSumInputSelector,
+  betslipAcceptChangesButtonSelector,
 } from './selectors';
 import { checkRestriction, accountBlocked } from './accountChecks';
 import checkBet from './checkBet';
 
 const minimumStake = 0.1;
+let tempMaximumStake = -1;
+
+export const getTempMaximumStake = (): number => {
+  return tempMaximumStake;
+};
+export const setTempMaximumStake = (newMaximumStake: number): void => {
+  tempMaximumStake = newMaximumStake;
+};
+export const clearTempMaximumStake = (): void => {
+  tempMaximumStake = -1;
+};
 
 export const checkLogin = (): boolean => {
   return Boolean(document.querySelector(memberHeaderSelector));
@@ -88,9 +100,22 @@ export const getMaximumStake = (): number => {
     const matches = betErrorMessage.match(
       /^Stake\/risk entered on selection .* is above the available maximum of .*(\d+\.\d+)\.$/
     );
-    if (matches && matches.length === 2) {
-      return parseFloat(matches[1]);
+    if (matches) {
+      const acceptButton = document.querySelector(
+        betslipAcceptChangesButtonSelector
+      ) as HTMLElement;
+      if (!acceptButton) {
+        worker.Helper.WriteLine('Ошибка макса: Нет кнопки принятия изменений');
+        return 0;
+      }
+      acceptButton.click();
+      worker.Helper.WriteLine(`Есть макс: ${matches[1]}`);
+      tempMaximumStake = Number(matches[1]);
+      return Number(matches[1]);
     }
+  }
+  if (tempMaximumStake !== -1) {
+    return tempMaximumStake;
   }
   return getBalance();
 };

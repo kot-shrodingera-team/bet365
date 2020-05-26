@@ -11,6 +11,7 @@ import checkStakeStatus from './callbacks/checkStakeStatus';
 import authorize from './authorize';
 import showStake, { clearReloadCount } from './showStake';
 import { inPlayControlBarSelector } from './selectors';
+import { clearTempMaximumStake } from './getInfo';
 
 clearSendMessageToTelegram();
 clearReloadCount();
@@ -24,6 +25,7 @@ const FastLoad = async (): Promise<void> => {
     worker.Helper.WriteLine('Открываем In-Play');
     window.location.href = `${window.location.origin}/#/IP/`;
   }
+  clearTempMaximumStake();
   showStake();
 };
 

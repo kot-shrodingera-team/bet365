@@ -3,6 +3,7 @@ import {
   betslipBetSelector,
   betslipBetStakeSumInputSelector,
 } from '../selectors';
+import { getTempMaximumStake, setTempMaximumStake } from '../getInfo';
 
 const setStakeSum = (sum: number): boolean => {
   const bet = document.querySelector(betslipBetSelector);
@@ -17,6 +18,20 @@ const setStakeSum = (sum: number): boolean => {
     worker.Helper.WriteLine(
       `Ошибка ввода суммы ставки: Не найдено поле ввода суммы ставки`
     );
+    return false;
+  }
+  worker.Helper.WriteLine(`Вводим сумму ставки: ${sum}`);
+  const tempMaximumStake = getTempMaximumStake();
+  if (sum < tempMaximumStake) {
+    worker.Helper.WriteLine(
+      `Сумма (${sum} меньше временного макса (${tempMaximumStake})`
+    );
+    const difference = Number((sum - tempMaximumStake).toFixed(2));
+    const newTempMaximumStake = Number(
+      (tempMaximumStake - difference).toFixed(2)
+    );
+    worker.Helper.WriteLine(`Новый временный макс: ${newTempMaximumStake}`);
+    setTempMaximumStake(newTempMaximumStake);
     return false;
   }
   stakeSumInput.value = String(sum);

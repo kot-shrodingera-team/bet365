@@ -98,7 +98,7 @@ const showStake = async (): Promise<void> => {
       worker.JSFail();
       return;
     }
-    window.location.href = `${window.location.origin}/#/IP/`;
+    window.location.href = `${worker.BookmakerMainUrl}/#/IP/`;
   }
   const controlBarSelectedItem = document.querySelector(
     inPlayControlBarSelectedItemSelector

@@ -23,7 +23,7 @@ const FastLoad = async (): Promise<void> => {
   // Можно заменить на проверку url
   if (!document.querySelector(inPlayControlBarSelector)) {
     worker.Helper.WriteLine('Открываем In-Play');
-    window.location.href = `${window.location.origin}/#/IP/`;
+    window.location.href = `${worker.BookmakerMainUrl}/#/IP/`;
   }
   clearTempMaximumStake();
   showStake();

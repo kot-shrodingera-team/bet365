@@ -1,4 +1,5 @@
 import { caseInsensitiveCompare } from '@kot-shrodingera-team/config/util';
+import WorkerBetObject from '@kot-shrodingera-team/config/workerBetObject';
 
 type checkMarketData = {
   error: boolean;

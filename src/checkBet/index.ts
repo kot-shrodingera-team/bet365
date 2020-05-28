@@ -1,3 +1,4 @@
+import WorkerBetObject from '@kot-shrodingera-team/config/workerBetObject';
 import {
   betslipBetDescriptionSelector,
   betslipBetHandicapSelector,

@@ -1,3 +1,4 @@
+import '@kot-shrodingera-team/config/request';
 import {
   betslipAcceptChangesButtonSelector,
   betslipPlaceBetButtonSelector,
@@ -6,14 +7,11 @@ import {
 } from '../selectors';
 import checkBet from '../checkBet';
 import { checkStakeEnabled, getCoefficientFromCoupon } from '../getInfo';
-import Request from '../request';
 import {
   clearSendMessageToTelegram,
   clearDoStakeCounter,
   setBetPlacing,
 } from './checkCouponLoading';
-
-const request = new Request();
 
 const doStake = (): boolean => {
   if (!checkStakeEnabled()) {

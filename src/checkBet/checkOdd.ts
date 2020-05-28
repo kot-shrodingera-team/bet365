@@ -1,4 +1,5 @@
 import { caseInsensitiveCompare, ri } from '@kot-shrodingera-team/config/util';
+import WorkerBetObject from '@kot-shrodingera-team/config/workerBetObject';
 import { getSiteTeamNames } from '../openEvent';
 import {
   formatParameterRegex,

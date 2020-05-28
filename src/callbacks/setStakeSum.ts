@@ -32,7 +32,6 @@ const setStakeSum = (sum: number): boolean => {
     );
     worker.Helper.WriteLine(`Новый временный макс: ${newTempMaximumStake}`);
     setTempMaximumStake(newTempMaximumStake);
-    return false;
   }
   stakeSumInput.value = String(sum);
   fireEvent(stakeSumInput, 'input');

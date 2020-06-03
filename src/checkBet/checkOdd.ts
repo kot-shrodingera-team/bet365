@@ -154,11 +154,11 @@ const getCheckOdd = (
         return error('В купоне неподходящая роспись');
       }
       if (cicmp(odd, 'F1')) {
-        if (cicmp(betslipMatch[1], teamNames.teamOne)) {
+        if (!cicmp(betslipMatch[1], teamNames.teamOne)) {
           return error('Открыта фора не на первого игрока');
         }
       } else if (cicmp(odd, 'F2')) {
-        if (cicmp(betslipMatch[1], teamNames.teamTwo)) {
+        if (!cicmp(betslipMatch[1], teamNames.teamTwo)) {
           return error('Открыта фора не на второго игрока');
         }
       } else {

@@ -35,6 +35,7 @@ const setStakeSum = (sum: number): boolean => {
   }
   stakeSumInput.value = String(sum);
   fireEvent(stakeSumInput, 'input');
+  worker.StakeInfo.Summ = sum;
   return true;
 };
 

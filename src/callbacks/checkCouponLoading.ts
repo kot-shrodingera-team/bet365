@@ -53,6 +53,18 @@ const checkCouponLoading = (): boolean => {
     isBetPlacing = false;
     return false;
   }
+  const betslipPlaceBetErrorMessageElement = document.querySelector(
+    '.bs-PlaceBetErrorMessage'
+  );
+  if (
+    betslipPlaceBetErrorMessageElement &&
+    betslipPlaceBetErrorMessageElement.textContent.trim() ===
+      'Please check My Bets for confirmation that your bet has been successfully placed.'
+  ) {
+    worker.Helper.WriteLine('Обработка ставки завершена (check My Bets)');
+    isBetPlacing = false;
+    return false;
+  }
   if (isBetPlacing) {
     if (getStakeCount() !== 1) {
       worker.Helper.WriteLine(

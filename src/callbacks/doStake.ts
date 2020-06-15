@@ -1,4 +1,3 @@
-import '@kot-shrodingera-team/config/request';
 import {
   betslipAcceptChangesButtonSelector,
   betslipPlaceBetButtonSelector,
@@ -51,8 +50,8 @@ const doStake = (): boolean => {
   clearDoStakeCounter();
   clearSendMessageToTelegram();
 
-  request.clearAllRequestResponseSubscribes();
-  request.subscribe(
+  window.request.clearAllRequestResponseSubscribes();
+  window.request.subscribe(
     'betslip/?op=2&ck=bs&betsource=FlashInPLay&streaming=1&fulltext=1&betguid=',
     () => {
       console.log(`betslip place response`);

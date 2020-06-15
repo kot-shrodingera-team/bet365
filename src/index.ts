@@ -1,4 +1,5 @@
 import './workerCheck';
+import './globalDefines/request';
 import './bookmakerApi';
 import { sleep } from '@kot-shrodingera-team/config/util';
 import getStakeInfo from './callbacks/getStakeInfo';

@@ -62,7 +62,7 @@ const normalize = (string: string): string => {
   // Заменяем дефисы и точки на пробелы
   result = result.replace(/[.-]/g, ' ');
   // Убираем знаки восклицания и кавычки
-  result = result.replace(/!'/g, '');
+  result = result.replace(/[!']/g, '');
   // Убираем лишние пробелы
   result = result.replace(/\s+/g, ' ').trim();
   return result;

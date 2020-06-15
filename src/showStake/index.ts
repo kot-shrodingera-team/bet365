@@ -6,14 +6,16 @@ import {
   inPlayControlBarSelectedItemSelector,
   betslipSpinnerSelector,
   betslipCloseButtonSelector,
-} from './selectors';
-import checkCurrentLanguage from './checkCurrentLanguage';
-import { checkCashOutEnabled, accountLimited } from './accountChecks';
+} from '../selectors';
+import checkLogin from '../stakeInfo/checkLogin';
+import updateBalance from '../stakeInfo/updateBalance';
+import checkCurrentLanguage from '../checkCurrentLanguage';
+import { checkCashOutEnabled, accountLimited } from '../accountChecks';
+import getStakeCount from '../stakeInfo/getStakeCount';
 import openEvent from './openEvent';
 import findBet from './findBet';
-import killEventListener from './killEventListener';
-import checkBet from './checkBet';
-import { checkLogin, updateBalance, getStakeCount } from './getInfo';
+import killEventListener from '../killEventListener';
+import checkBet from '../checkBet';
 
 let reloadCount = 0;
 

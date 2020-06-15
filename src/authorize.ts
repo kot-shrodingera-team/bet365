@@ -8,7 +8,8 @@ import {
   memberBalanceSelector,
 } from './selectors';
 import { checkCashOutEnabled, accountLimited } from './accountChecks';
-import { checkLogin, updateBalance } from './getInfo';
+import checkLogin from './stakeInfo/checkLogin';
+import updateBalance from './stakeInfo/updateBalance';
 
 const authorize = async (): Promise<void> => {
   worker.Helper.WriteLine('Проверка авторизации');

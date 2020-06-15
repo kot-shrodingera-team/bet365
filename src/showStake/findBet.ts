@@ -4,7 +4,7 @@ import {
   marketGroupHeaderSelector,
   closedMarketGroupButtonSelector,
   buttonBarItemNotSelectedSelector,
-} from './selectors';
+} from '../selectors';
 
 type Participant = HTMLElement & {
   wrapper: {

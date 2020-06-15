@@ -5,12 +5,13 @@ import {
   betslipBetCreditsCheckboxSelectedClass,
 } from '../selectors';
 import checkBet from '../checkBet';
-import { checkStakeEnabled, getCoefficientFromCoupon } from '../getInfo';
 import {
   clearSendMessageToTelegram,
   clearDoStakeCounter,
   setBetPlacing,
 } from './checkCouponLoading';
+import checkStakeEnabled from '../stakeInfo/checkStakeEnabled';
+import getCoefficient from '../stakeInfo/getCoefficient';
 
 const doStake = (): boolean => {
   if (!checkStakeEnabled()) {
@@ -27,7 +28,7 @@ const doStake = (): boolean => {
     return false;
   }
 
-  if (worker.StakeInfo.Coef !== getCoefficientFromCoupon()) {
+  if (worker.StakeInfo.Coef !== getCoefficient()) {
     worker.Helper.WriteLine('Ошибка ставки: Коэффициент изменился');
     return false;
   }

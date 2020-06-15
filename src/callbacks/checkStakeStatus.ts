@@ -5,7 +5,7 @@ import {
   standardBetslipSelector,
 } from '../selectors';
 import { checkRestriction, accountBlocked } from '../accountChecks';
-import { updateBalance } from '../getInfo';
+import updateBalance from '../stakeInfo/updateBalance';
 
 const checkStakeStatus = (): boolean => {
   if (checkRestriction()) {

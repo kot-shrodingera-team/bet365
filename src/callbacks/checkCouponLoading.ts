@@ -4,8 +4,8 @@ import {
   betslipPlaceBetButtonTextSelector,
 } from '../selectors';
 import showStake from '../showStake';
-import { getStakeCount } from '../getInfo';
 import { checkRestriction, accountBlocked } from '../accountChecks';
+import getStakeCount from '../stakeInfo/getStakeCount';
 
 let sendMessageToTelegram = false;
 let doStakeCounter = 0;

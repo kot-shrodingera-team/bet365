@@ -4,7 +4,7 @@ import {
   betslipBetHandicapSelector,
   betslipBetDetailsSelector,
 } from '../selectors';
-import { getCurrentEventName } from '../openEvent';
+import { getCurrentEventName } from '../showStake/openEvent';
 import getCheckMarket from './checkMarket';
 import getCheckOdd from './checkOdd';
 

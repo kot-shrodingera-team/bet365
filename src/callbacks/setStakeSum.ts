@@ -3,7 +3,10 @@ import {
   betslipBetSelector,
   betslipBetStakeSumInputSelector,
 } from '../selectors';
-import { getTempMaximumStake, setTempMaximumStake } from '../getInfo';
+import {
+  getTempMaximumStake,
+  setTempMaximumStake,
+} from '../stakeInfo/getMaximumStake';
 
 const setStakeSum = (sum: number): boolean => {
   const bet = document.querySelector(betslipBetSelector);

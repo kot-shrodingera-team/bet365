@@ -14,7 +14,7 @@ import {
   overviewSportHeaderSelector,
   overviewCompetitionSelector,
   overviewTeamStackTeamSelector,
-} from './selectors';
+} from '../selectors';
 
 export const getCurrentEventName = (): string => {
   const eventNameElement = document.querySelector(eventNameSelector);

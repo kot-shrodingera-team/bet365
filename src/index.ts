@@ -12,7 +12,7 @@ import checkStakeStatus from './callbacks/checkStakeStatus';
 import authorize from './authorize';
 import showStake, { clearReloadCount } from './showStake';
 import { inPlayControlBarSelector } from './selectors';
-import { clearTempMaximumStake } from './getInfo';
+import { clearTempMaximumStake } from './stakeInfo/getMaximumStake';
 
 clearSendMessageToTelegram();
 clearReloadCount();

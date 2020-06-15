@@ -63,7 +63,14 @@ export const getCoefficientFromCoupon = (): number => {
   }
   const odds = bet.querySelector(betslipBetOddsSelector);
   try {
-    return parseFloat(odds.textContent);
+    const coefficient = Number(odds.textContent);
+    if (Number.isNaN(coefficient)) {
+      worker.Helper.WriteLine(
+        `Не удалось определить коэффициент (${odds.textContent})`
+      );
+      return 1;
+    }
+    return coefficient;
   } catch (e) {
     worker.Helper.WriteLine(`Ошибка получения коэффициента - ${e}`);
     return -1;

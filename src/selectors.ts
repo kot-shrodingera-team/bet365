@@ -4,10 +4,10 @@ export const passwordInputSelector = 'input.lms-StandardLogin_Password';
 export const logInButtonSelector = '.lms-StandardLogin_LoginButtonText';
 export const memberHeaderSelector = '.hm-MainHeaderMembersWide';
 export const memberBalanceSelector = '.hm-MainHeaderMembersWide_Balance';
-export const inPlayControlBarSelector = 'span.ip-ControlBar_ButtonBar';
+export const inPlayControlBarSelector = '.ip-ControlBar_ButtonBar';
 export const inPlayControlBarItemSelector = '.ip-ControlBar_BBarItem';
 export const inPlayControlBarSelectedItemSelector =
-  '.ip-ControlBar_BBarItem.lul-ButtonBar_Selected';
+  '.ip-ControlBar_BBarItem.lul-ButtonBar_Selected, .ip-ControlBar_BBarItem-selected';
 export const eventNameSelector = '.ipe-GridHeader_FixtureCell';
 export const leftSideBarCompetitionSelector =
   '.ipn-CompetitionContainer .ipn-FixtureButton';

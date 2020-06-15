@@ -142,6 +142,8 @@ const showStake = async (): Promise<void> => {
   // Ищем нужное событие
   if (!(await openEvent())) {
     worker.JSFail();
+    worker.Helper.WriteLine('Перезагружаем страницу');
+    worker.Helper.LoadUrl(window.location.origin);
     return;
   }
 

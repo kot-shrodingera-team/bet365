@@ -4,9 +4,9 @@ import {
   betslipBetHandicapSelector,
   betslipBetDetailsSelector,
 } from '../selectors';
-import { getCurrentEventName } from '../showStake/openEvent';
 import getCheckMarket from './checkMarket';
 import getCheckOdd from './checkOdd';
+import getCurrentEventName from './getCurrentEventName';
 
 type checkBetObject = { parameter: number; correctness: boolean };
 

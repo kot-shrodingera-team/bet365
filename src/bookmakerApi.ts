@@ -1,3 +1,18 @@
+interface Bet365Bet {
+  ConstructString: string;
+  Uid: string;
+}
+
+interface Bet365AddBetData {
+  item: Bet365Bet;
+  action: number;
+  partType: string;
+  constructString: string;
+  key: () => string;
+  getSportType: () => string;
+  getCastCode: () => string;
+}
+
 interface Locator {
   user: {
     _balance: {
@@ -8,12 +23,14 @@ interface Locator {
   betSlipManager: {
     getBetCount: () => number;
     deleteAllBets: () => void;
+    addBet: (data: Bet365AddBetData) => void;
   };
 }
 
 declare global {
+  // eslint-disable-next-line no-redeclare
   const Locator: Locator;
-  // eslint-disable-next-line @typescript-eslint/camelcase
+  // eslint-disable-next-line no-redeclare, @typescript-eslint/camelcase
   const ns_favouriteslib_ui: unknown;
 }
 

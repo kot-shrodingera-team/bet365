@@ -1,4 +1,4 @@
-const minimumStake = 0.1;
+const minimumStake = 0.2;
 
 const getMinimumStake = (): number => {
   return minimumStake;

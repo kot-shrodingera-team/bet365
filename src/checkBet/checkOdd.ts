@@ -1,6 +1,5 @@
 import { caseInsensitiveCompare, ri } from '@kot-shrodingera-team/config/util';
 import WorkerBetObject from '@kot-shrodingera-team/config/workerBetObject';
-import { getSiteTeamNames } from '../showStake/openEvent';
 import {
   formatParameterRegex,
   getHandicapScoreOffset,
@@ -8,6 +7,7 @@ import {
   getTennisCompletedSetsCount,
   getTennisCompletedSetsGamesCount,
 } from './util';
+import getSiteTeamNames from './getSiteTeamNames';
 
 const cicmp = caseInsensitiveCompare;
 

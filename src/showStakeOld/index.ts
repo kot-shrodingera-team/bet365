@@ -3,24 +3,24 @@ import {
   remainLoginnedSelector,
   freeBetMessageCloseSelector,
   inPlayControlBarSelector,
+  inPlayControlBarSelectedItemSelector,
+  betslipSpinnerSelector,
+  betslipCloseButtonSelector,
 } from '../selectors';
 import checkLogin from '../stakeInfo/checkLogin';
 import updateBalance from '../stakeInfo/updateBalance';
+import checkCurrentLanguage from '../checkCurrentLanguage';
 import { checkCashOutEnabled, accountLimited } from '../accountChecks';
 import getStakeCount from '../stakeInfo/getStakeCount';
-// import killEventListener from '../killEventListener';
+import openEvent from './openEvent';
+import findBet from './findBet';
+import killEventListener from '../killEventListener';
 import checkBet from '../checkBet';
-import getCurrentEventName from '../checkBet/getCurrentEventName';
 
 let reloadCount = 0;
-let cashOutChecked = false;
 
 export const clearReloadCount = (): void => {
   reloadCount = 0;
-};
-
-export const clearCashoutChecked = (): void => {
-  cashOutChecked = false;
 };
 
 const showStake = async (): Promise<void> => {
@@ -70,19 +70,16 @@ const showStake = async (): Promise<void> => {
   }
   updateBalance();
 
-  // await checkCurrentLanguage();
+  await checkCurrentLanguage();
   // if (!(await checkCurrentLanguage())) {
   //   worker.JSFail();
   // }
 
-  if (!cashOutChecked) {
-    const cashOutEnabled = await checkCashOutEnabled();
-    if (cashOutEnabled === 0) {
-      worker.Helper.WriteLine('Не удалось определить порезку аккаунта');
-    } else if (cashOutEnabled === -1) {
-      accountLimited();
-    }
-    cashOutChecked = true;
+  const cashOutEnabled = await checkCashOutEnabled();
+  if (cashOutEnabled === 0) {
+    worker.Helper.WriteLine('Не удалось определить порезку аккаунта');
+  } else if (cashOutEnabled === -1) {
+    accountLimited();
   }
 
   const controlBar = await getElement(inPlayControlBarSelector);
@@ -103,6 +100,16 @@ const showStake = async (): Promise<void> => {
       return;
     }
     window.location.href = `${worker.BookmakerMainUrl}/#/IP/`;
+  }
+  const controlBarSelectedItem = document.querySelector(
+    inPlayControlBarSelectedItemSelector
+  );
+  if (!controlBarSelectedItem) {
+    worker.Helper.WriteLine(
+      'Ошибка открытия купона: Не найден текущий элемент Control Bar'
+    );
+    worker.JSFail();
+    return;
   }
 
   const stakeCount = getStakeCount();
@@ -133,60 +140,91 @@ const showStake = async (): Promise<void> => {
     }
   }
 
-  const betData = worker.BetId.split('_');
-  if (betData.length !== 5) {
+  // Ищем нужное событие
+  if (!(await openEvent())) {
+    worker.JSFail();
+    worker.Helper.WriteLine('Перезагружаем страницу');
+    worker.Helper.LoadUrl(window.location.origin);
+    return;
+  }
+
+  // ///////////// Поиск исхода
+
+  // if (!checkCurrentEvent()) {
+  //     worker.Helper.WriteLine('Ошибка открытия купона: Заголовок открытого события не подходит');
+  //     worker.JSFail();
+  //     return;
+  // }
+
+  // await awaiter(() => bsFrame && bsFrame.bsApp);
+
+  // if (!bsFrame.bsApp) {
+  //     worker.Helper.WriteLine('Ошибка открытия купона: Не иницализирован интерфейс купона');
+  //     worker.JSFail();
+  //     return;
+  // }
+  if (document.querySelector(betslipSpinnerSelector)) {
+    reloadCount += 1;
+    if (reloadCount > 3) {
+      worker.JSFail();
+      worker.Helper.WriteLine(
+        'Ошибка открытия купона: Купон в состоянии принятия ставки'
+      );
+      return;
+    }
     worker.Helper.WriteLine(
-      'Некорректный формат данных о ставке. Сообщите в ТП'
+      'Ошибка открытия купона: Купон в состоянии принятия ставки'
     );
+    worker.Helper.LoadUrl(`${worker.EventUrl}#/IP/`);
+    return;
+  }
+
+  const betslipCloseButton = document.querySelector(
+    betslipCloseButtonSelector
+  ) as HTMLElement;
+  if (betslipCloseButton) {
+    betslipCloseButton.click();
+  }
+
+  const participant = findBet();
+  if (!participant) {
+    worker.Helper.WriteLine('Ошибка открытия купона: Исход не найден');
     worker.JSFail();
     return;
   }
-  const [betId, fi, od, zw /* , betName */] = betData;
 
-  const ConstructString = `pt=N#o=${od}#f=${fi}#fp=${betId}#so=#c=1#mt=1#id=${zw}Y#|TP=BS${zw}#`;
-  const Uid = '';
-  // const pom = '1';
-  const partType = 'N';
-  const getSportType = (): string => partType;
-  const getCastCode = (): string => '';
-  const key = (): string => zw;
-  const bet = {
-    // pom,
-    ConstructString,
-    Uid,
-  };
+  worker.Helper.WriteLine('Исход найден');
+  console.log(participant);
+  participant.style.border = '1px solid red';
+  // Скроллит и шапку сайта
+  // participant.scrollIntoView();
+  // eslint-disable-next-line no-underscore-dangle
+  if (participant.wrapper._suspended) {
+    worker.Helper.WriteLine('Исход Suspended');
+    worker.JSFail();
+    return;
+  }
 
-  Locator.betSlipManager.addBet({
-    item: bet,
-    action: 0,
-    partType,
-    constructString: ConstructString,
-    key,
-    getSportType,
-    getCastCode,
-  });
+  // let betIitem = participant.wrapper.getBetItem();
+  // let bet = {
+  //     ConstructString: betIitem.constructString,
+  //     Uid: betIitem.uid
+  // };
+  // bsFrame.bsApp.addBet(bet);
 
-  console.log(bet);
-
+  killEventListener('touchstart');
+  participant.click();
+  // Можно добавить проверку по id
   const betAdded = await awaiter(() => getStakeCount() === 1);
   worker.Helper.WriteLine(`Количество ставок в купоне: ${getStakeCount()}`);
   if (betAdded) {
     worker.Helper.WriteLine('Купон открыт');
-    const eventNameLoaded = await awaiter(() => getCurrentEventName() !== null);
-    if (!eventNameLoaded) {
-      worker.Helper.WriteLine('Название события так и не повилось в купоне');
-      worker.JSFail();
-      return;
-    }
     if (!checkBet(true).correctness) {
       worker.Helper.WriteLine('Ставка не соответствует росписи');
       worker.JSFail();
       return;
     }
     worker.JSStop();
-    const eventUrl = worker.EventUrl;
-    const [eventId] = eventUrl.split('/').slice(-1);
-    window.location.href = `${window.location.origin}/#/IP/${eventId}`;
   } else {
     worker.Helper.WriteLine(
       'Ошибка открытия купона: Ставка так и не попала в купон'

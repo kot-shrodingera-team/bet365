@@ -1,7 +1,7 @@
 import './workerCheck';
 import './globalDefines/request';
 import './bookmakerApi';
-import { sleep } from '@kot-shrodingera-team/config/util';
+import { sleep, pipeHwlToConsole } from '@kot-shrodingera-team/config/util';
 import getStakeInfo from './callbacks/getStakeInfo';
 import setStakeSum from './callbacks/setStakeSum';
 import doStake from './callbacks/doStake';
@@ -10,23 +10,26 @@ import checkCouponLoading, {
 } from './callbacks/checkCouponLoading';
 import checkStakeStatus from './callbacks/checkStakeStatus';
 import authorize from './authorize';
-import showStake, { clearReloadCount } from './showStake';
-import { inPlayControlBarSelector } from './selectors';
+import showStake, { clearReloadCount, clearCashoutChecked } from './showStake';
+// import { inPlayControlBarSelector } from './selectors';
 import { clearTempMaximumStake } from './stakeInfo/getMaximumStake';
+import afterSuccesfulStake from './callbacks/afterSuccesfulStake';
 
+pipeHwlToConsole();
 clearSendMessageToTelegram();
 clearReloadCount();
 
 const FastLoad = async (): Promise<void> => {
   clearReloadCount();
-  // worker.Helper.WriteLine('Быстрая загрузка');
+  // // worker.Helper.WriteLine('Быстрая загрузка');
 
-  // Можно заменить на проверку url
-  if (!document.querySelector(inPlayControlBarSelector)) {
-    worker.Helper.WriteLine('Открываем In-Play');
-    window.location.href = `${worker.BookmakerMainUrl}/#/IP/`;
-  }
+  // // Можно заменить на проверку url
+  // if (!document.querySelector(inPlayControlBarSelector)) {
+  //   worker.Helper.WriteLine('Открываем In-Play');
+  //   window.location.href = `${worker.BookmakerMainUrl}/#/IP/`;
+  // }
   clearTempMaximumStake();
+  clearCashoutChecked();
   showStake();
 };
 
@@ -36,7 +39,8 @@ worker.SetCallBacks(
   setStakeSum,
   doStake,
   checkCouponLoading,
-  checkStakeStatus
+  checkStakeStatus,
+  afterSuccesfulStake
 );
 worker.SetFastCallback(FastLoad);
 

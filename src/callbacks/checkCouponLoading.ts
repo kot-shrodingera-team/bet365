@@ -1,6 +1,7 @@
+import { minVersion } from '@kot-shrodingera-team/config/util';
 import {
   betslipAcceptChangesButtonSelector,
-  betslipHeaderTextSelector,
+  // betslipHeaderTextSelector,
   betslipPlaceBetButtonTextSelector,
 } from '../selectors';
 import showStake from '../showStake';
@@ -36,12 +37,12 @@ const checkCouponLoading = (): boolean => {
     worker.Helper.WriteLine('В купоне были изменения');
     return false;
   }
-  const betslipHeaderText = document.querySelector(betslipHeaderTextSelector);
-  if (betslipHeaderText && betslipHeaderText.textContent === 'Bet Placed') {
-    worker.Helper.WriteLine('Обработка ставки завершена (Bet Placed)');
-    isBetPlacing = false;
-    return false;
-  }
+  // const betslipHeaderText = document.querySelector(betslipHeaderTextSelector);
+  // if (betslipHeaderText && betslipHeaderText.textContent === 'Bet Placed') {
+  //   worker.Helper.WriteLine('Обработка ставки завершена (Bet Placed)');
+  //   isBetPlacing = false;
+  //   return false;
+  // }
   const betslipPlaceBetButtonText = document.querySelector(
     betslipPlaceBetButtonTextSelector
   );
@@ -74,9 +75,12 @@ const checkCouponLoading = (): boolean => {
       return false;
     }
     doStakeCounter += 1;
-    if (doStakeCounter > 20 && !sendMessageToTelegram) {
+    if (
+      doStakeCounter > (minVersion('0.1.813.6') ? 200 : 20) &&
+      !sendMessageToTelegram
+    ) {
       worker.Helper.SendInformedMessage(
-        `Купон в Bet365 долго не принимается более 20 секунд, возможно завис`
+        `Купон в Bet365 долго не принимается, возможно завис`
       );
       sendMessageToTelegram = true;
     }

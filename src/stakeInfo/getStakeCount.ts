@@ -1,7 +1,8 @@
-import { betslipBetSelector } from '../selectors';
+// import { betslipBetSelector } from '../selectors';
 
 const getStakeCount = (): number => {
-  return document.querySelectorAll(betslipBetSelector).length;
+  // return document.querySelectorAll(betslipBetSelector).length;
+  return Locator.betSlipManager.getBetCount();
   // let betCount = Locator.betSlipManager.getBetCount();
   // if (Number.isInteger(betCount)) {
   //     return betCount;

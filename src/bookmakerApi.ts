@@ -6,6 +6,7 @@ interface Locator {
     };
   };
   betSlipManager: {
+    getBetCount: () => number;
     deleteAllBets: () => void;
   };
 }

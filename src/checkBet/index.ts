@@ -12,7 +12,7 @@ type checkBetObject = { parameter: number; correctness: boolean };
 
 const checkBet = (log = false): checkBetObject => {
   const badBet = (): checkBetObject => ({
-    parameter: null as number,
+    parameter: -9999,
     correctness: false,
   });
   const goodBet = (parameter = -6666): checkBetObject => ({

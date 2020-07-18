@@ -9,9 +9,11 @@ import {
   clearSendMessageToTelegram,
   clearDoStakeCounter,
   setBetPlacing,
+  setIsNewMax,
 } from './checkCouponLoading';
 import checkStakeEnabled from '../stakeInfo/checkStakeEnabled';
 import getCoefficient from '../stakeInfo/getCoefficient';
+import { clearDoStakeTime } from '../stakeInfo/getDoStakeTime';
 
 const doStake = (): boolean => {
   if (!checkStakeEnabled()) {
@@ -24,7 +26,6 @@ const doStake = (): boolean => {
   ) as HTMLElement;
   if (acceptButton) {
     worker.Helper.WriteLine('Ошибка ставки: В купоне были изменения');
-    acceptButton.click();
     return false;
   }
 
@@ -50,6 +51,7 @@ const doStake = (): boolean => {
   setBetPlacing(true);
   clearDoStakeCounter();
   clearSendMessageToTelegram();
+  setIsNewMax(false);
 
   window.request.clearAllRequestResponseSubscribes();
   window.request.subscribe(
@@ -73,6 +75,7 @@ const doStake = (): boolean => {
   }
 
   placeBetButton.click();
+  clearDoStakeTime();
   worker.Helper.WriteLine('Нажали на кнопку принятия ставки');
 
   // Вариант ждать пока

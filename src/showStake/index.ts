@@ -8,9 +8,10 @@ import checkLogin from '../stakeInfo/checkLogin';
 import updateBalance from '../stakeInfo/updateBalance';
 import { checkCashOutEnabled, accountLimited } from '../accountChecks';
 import getStakeCount from '../stakeInfo/getStakeCount';
-// import killEventListener from '../killEventListener';
 import checkBet from '../checkBet';
 import getCurrentEventName from '../checkBet/getCurrentEventName';
+import checkUrl from '../checkUrl';
+import changeToStandardBetslip from './changeToStandardBetslip';
 
 let reloadCount = 0;
 let cashOutChecked = false;
@@ -24,7 +25,11 @@ export const clearCashoutChecked = (): void => {
 };
 
 const showStake = async (): Promise<void> => {
-  Locator.betSlipManager.deleteAllBets();
+  if (!checkUrl()) {
+    worker.Helper.WriteLine('Открыт не сайт Bet365 или указанное зеркало');
+    worker.JSFail();
+    return;
+  }
   if (
     worker.GetSessionData &&
     worker.GetSessionData('Bet365 Blocked') === '1'
@@ -35,6 +40,16 @@ const showStake = async (): Promise<void> => {
       worker.Helper.SendInformedMessage(pauseMessage);
     }
     worker.Helper.WriteLine('Аккаунт заблокирован');
+    worker.JSFail();
+    return;
+  }
+
+  const locatorLoaded = await awaiter(
+    () => typeof Locator !== 'undefined',
+    10000
+  );
+  if (!locatorLoaded) {
+    worker.Helper.WriteLine('API не загрузилось');
     worker.JSFail();
     return;
   }
@@ -105,6 +120,14 @@ const showStake = async (): Promise<void> => {
     window.location.href = `${worker.BookmakerMainUrl}/#/IP/`;
   }
 
+  // Если осталось висеть Check My Bets в купоне
+  const closeBetslipButton = document.querySelector(
+    '.bss-DefaultContent_Close'
+  ) as HTMLElement;
+  if (closeBetslipButton) {
+    worker.Helper.WriteLine('Закрываем купон');
+    closeBetslipButton.click();
+  }
   const stakeCount = getStakeCount();
   if (stakeCount === 0) {
     worker.Helper.WriteLine('Купон пуст');
@@ -131,16 +154,18 @@ const showStake = async (): Promise<void> => {
       worker.Helper.LoadUrl(`${window.location.origin}/#/IP/`);
       return;
     }
+    worker.Helper.WriteLine('Купон успешно очищен');
   }
 
-  const betData = worker.BetId.split('_');
-  if (betData.length !== 5) {
+  const rawBetData = worker.BetId.split('_');
+  if (rawBetData.length < 5) {
     worker.Helper.WriteLine(
       'Некорректный формат данных о ставке. Сообщите в ТП'
     );
     worker.JSFail();
     return;
   }
+  const betData = rawBetData.slice(0, 4).concat(rawBetData.slice(4).join('_'));
   const [betId, fi, od, zw /* , betName */] = betData;
 
   const ConstructString = `pt=N#o=${od}#f=${fi}#fp=${betId}#so=#c=1#mt=1#id=${zw}Y#|TP=BS${zw}#`;
@@ -172,21 +197,36 @@ const showStake = async (): Promise<void> => {
   worker.Helper.WriteLine(`Количество ставок в купоне: ${getStakeCount()}`);
   if (betAdded) {
     worker.Helper.WriteLine('Купон открыт');
-    const eventNameLoaded = await awaiter(() => getCurrentEventName() !== null);
-    if (!eventNameLoaded) {
+    await Promise.race([
+      awaiter(() => getCurrentEventName() !== null),
+      getElement('.qbs-StakeBox_StakeInput'),
+    ]);
+    const qbsStakeInput = document.querySelector('.qbs-StakeBox_StakeInput');
+    if (qbsStakeInput) {
+      worker.Helper.WriteLine('Мобильный купон. Переключаем на стандартный');
+      if (!changeToStandardBetslip()) {
+        worker.Helper.WriteLine('Не удалось переключится на стандартный купон');
+        worker.JSFail();
+        return;
+      }
+      await awaiter(() => getCurrentEventName() !== null);
+    }
+    if (getCurrentEventName() === null) {
       worker.Helper.WriteLine('Название события так и не повилось в купоне');
       worker.JSFail();
       return;
     }
+    // Если есть параметр, нужно его дождаться
+    await getElement('.bss-NormalBetItem_Handicap', 100);
     if (!checkBet(true).correctness) {
       worker.Helper.WriteLine('Ставка не соответствует росписи');
       worker.JSFail();
       return;
     }
     worker.JSStop();
-    const eventUrl = worker.EventUrl;
-    const [eventId] = eventUrl.split('/').slice(-1);
-    window.location.href = `${window.location.origin}/#/IP/${eventId}`;
+    // const eventUrl = worker.EventUrl;
+    // const [eventId] = eventUrl.split('/').slice(-1);
+    // window.location.href = `${window.location.origin}/#/IP/${eventId}`;
   } else {
     worker.Helper.WriteLine(
       'Ошибка открытия купона: Ставка так и не попала в купон'

@@ -39,17 +39,15 @@ export const checkRestriction = (): boolean => {
 };
 
 export const accountBlocked = (): void => {
-  const message = 'Аккаунт Bet365 заблокирован!';
-  worker.Helper.WriteLine(message);
-  worker.Helper.SendInformedMessage(message);
   if (worker.SetSessionData) {
     worker.SetSessionData('Bet365 Blocked', '1');
   }
-  if (worker.SetBookmakerPaused && worker.SetBookmakerPaused(true)) {
-    const pauseMessage = 'Bet365 поставлен на паузу';
-    worker.Helper.WriteLine(pauseMessage);
-    worker.Helper.SendInformedMessage(pauseMessage);
-  }
+  const message =
+    worker.SetBookmakerPaused && worker.SetBookmakerPaused(true)
+      ? 'Аккаунт Bet365 заблокирован! Bet365 поставлен на паузу'
+      : 'Аккаунт Bet365 заблокирован! Bet365 НЕ поставлен на паузу. Поставьте на паузу вручную';
+  worker.Helper.WriteLine(message);
+  worker.Helper.SendInformedMessage(message);
 };
 
 export const accountLimited = (): void => {

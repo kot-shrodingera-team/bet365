@@ -5,24 +5,24 @@ const afterSuccesfulStake = (): void => {
     worker.Helper.WriteLine('Обновление данных об успешной ставке');
     const lastStakeCoefficient = document.querySelector('.bs-OddsLabel');
     if (!lastStakeCoefficient) {
-      worker.Helper.WriteLine('Не найден коеффициент последней ставки');
+      worker.Helper.WriteLine('Не найден коэффициент последней ставки');
       return;
     }
     const coefficient = Number(lastStakeCoefficient.textContent);
     if (Number.isNaN(coefficient)) {
       worker.Helper.WriteLine(
-        `Непонятный формат коеффициента последней ставки: ${lastStakeCoefficient.textContent}`
+        `Непонятный формат коэффициента последней ставки: ${lastStakeCoefficient.textContent}`
       );
       return;
     }
     if (coefficient !== worker.StakeInfo.Coef) {
       worker.Helper.WriteLine(
-        `Коеффициент изменился: ${worker.StakeInfo.Coef} => ${coefficient}`
+        `Коэффициент изменился: ${worker.StakeInfo.Coef} => ${coefficient}`
       );
       worker.StakeInfo.Coef = coefficient;
       return;
     }
-    worker.Helper.WriteLine('Коеффициент не изменился');
+    worker.Helper.WriteLine('Коэффициент не изменился');
   }
 };
 

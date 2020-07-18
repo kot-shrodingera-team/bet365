@@ -1,4 +1,8 @@
-import { getElement, awaiter } from '@kot-shrodingera-team/config/util';
+import {
+  getElement,
+  awaiter,
+  checkUrl,
+} from '@kot-shrodingera-team/config/util';
 import {
   memberHeaderSelector,
   logInModalButtonSelector,
@@ -12,6 +16,10 @@ import checkLogin from './stakeInfo/checkLogin';
 import updateBalance from './stakeInfo/updateBalance';
 
 const authorize = async (): Promise<void> => {
+  if (!checkUrl()) {
+    worker.Helper.WriteLine('Открыт не сайт Bet365 или указанное зеркало');
+    return;
+  }
   worker.Helper.WriteLine('Проверка авторизации');
   await Promise.race([
     getElement(memberHeaderSelector, 10000),

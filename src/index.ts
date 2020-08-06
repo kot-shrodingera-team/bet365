@@ -5,9 +5,7 @@ import { pipeHwlToConsole, checkUrl } from '@kot-shrodingera-team/config/util';
 import getStakeInfo from './callbacks/getStakeInfo';
 import setStakeSum from './callbacks/setStakeSum';
 import doStake from './callbacks/doStake';
-import checkCouponLoading, {
-  clearSendMessageToTelegram,
-} from './callbacks/checkCouponLoading';
+import checkCouponLoading from './callbacks/checkCouponLoading';
 import checkStakeStatus from './callbacks/checkStakeStatus';
 import authorize from './authorize';
 import showStake, { clearReloadCount, clearCashoutChecked } from './showStake';
@@ -16,7 +14,6 @@ import afterSuccesfulStake from './callbacks/afterSuccesfulStake';
 import { inPlayControlBarSelector } from './selectors';
 
 pipeHwlToConsole();
-clearSendMessageToTelegram();
 clearReloadCount();
 
 const FastLoad = async (): Promise<void> => {

@@ -1,4 +1,8 @@
-import { getElement, awaiter } from '@kot-shrodingera-team/config/util';
+import {
+  getElement,
+  awaiter,
+  checkUrl,
+} from '@kot-shrodingera-team/config/util';
 import {
   remainLoginnedSelector,
   freeBetMessageCloseSelector,
@@ -10,7 +14,6 @@ import { checkCashOutEnabled, accountLimited } from '../accountChecks';
 import getStakeCount from '../stakeInfo/getStakeCount';
 import checkBet from '../checkBet';
 import getCurrentEventName from '../checkBet/getCurrentEventName';
-import checkUrl from '../checkUrl';
 import changeToStandardBetslip from './changeToStandardBetslip';
 
 let reloadCount = 0;

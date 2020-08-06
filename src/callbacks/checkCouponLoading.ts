@@ -1,4 +1,3 @@
-import { minVersion } from '@kot-shrodingera-team/config/util';
 import {
   betslipAcceptChangesButtonSelector,
   // betslipHeaderTextSelector,
@@ -10,18 +9,8 @@ import getStakeCount from '../stakeInfo/getStakeCount';
 import { updateMaximumStake } from '../stakeInfo/getMaximumStake';
 import { getDoStakeTime } from '../stakeInfo/getDoStakeTime';
 
-let sendMessageToTelegram = false;
-let doStakeCounter = 0;
 let isBetPlacing = false;
 let isNewMax = false;
-
-export const clearDoStakeCounter = (): void => {
-  doStakeCounter = 0;
-};
-
-export const clearSendMessageToTelegram = (): void => {
-  sendMessageToTelegram = false;
-};
 
 export const setBetPlacing = (status: boolean): void => {
   isBetPlacing = status;
@@ -56,10 +45,10 @@ const checkCouponLoading = (): boolean => {
   const acceptButton = document.querySelector(
     betslipAcceptChangesButtonSelector
   );
+  const timePassedSinceDoStake =
+    new Date().getTime() - getDoStakeTime().getTime();
   if (acceptButton) {
     if (isNewMax) {
-      const timePassedSinceDoStake =
-        new Date().getTime() - getDoStakeTime().getTime();
       if (timePassedSinceDoStake < 2000) {
         worker.Helper.WriteLine(
           'Обработка ставки (задержка в 2 секунды при появлении макса)'
@@ -94,15 +83,20 @@ const checkCouponLoading = (): boolean => {
     return false;
   }
   if (isBetPlacing) {
-    doStakeCounter += 1;
-    if (
-      doStakeCounter > (minVersion('0.1.813.6') ? 200 : 20) &&
-      !sendMessageToTelegram
-    ) {
-      worker.Helper.SendInformedMessage(
-        `Купон в Bet365 долго не принимается, возможно завис`
+    if (timePassedSinceDoStake > 30000) {
+      const message =
+        `В Bet365 слишком долгая обработка купона\n` +
+        `Бот засчитает ставку как НЕ принятую\n` +
+        `Событие: ${worker.TeamOne} - ${worker.TeamTwo}\n` +
+        `Ставка: ${worker.BetName}\n` +
+        `Сумма: ${worker.StakeInfo.Summ}\n` +
+        `Коэффициент: ${worker.StakeInfo.Coef}\n` +
+        `Пожалуйста, проверьте самостоятельно. Если всё плохо - пишите в ТП`;
+      worker.Helper.SendInformedMessage(message);
+      worker.Helper.WriteLine(
+        `Слишком долгая обработка, считаем ставку непринятой`
       );
-      sendMessageToTelegram = true;
+      return false;
     }
     if (getStakeCount() !== 1) {
       const message =

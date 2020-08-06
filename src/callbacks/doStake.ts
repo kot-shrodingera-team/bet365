@@ -5,12 +5,7 @@ import {
   betslipBetCreditsCheckboxSelectedClass,
 } from '../selectors';
 import checkBet from '../checkBet';
-import {
-  clearSendMessageToTelegram,
-  clearDoStakeCounter,
-  setBetPlacing,
-  setIsNewMax,
-} from './checkCouponLoading';
+import { setBetPlacing, setIsNewMax } from './checkCouponLoading';
 import checkStakeEnabled from '../stakeInfo/checkStakeEnabled';
 import getCoefficient from '../stakeInfo/getCoefficient';
 import { clearDoStakeTime } from '../stakeInfo/getDoStakeTime';
@@ -49,8 +44,6 @@ const doStake = (): boolean => {
   // bsFrame.bsApp.placeBet();
 
   setBetPlacing(true);
-  clearDoStakeCounter();
-  clearSendMessageToTelegram();
   setIsNewMax(false);
 
   window.request.clearAllRequestResponseSubscribes();

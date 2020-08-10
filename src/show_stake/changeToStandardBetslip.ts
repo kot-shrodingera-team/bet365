@@ -1,19 +1,17 @@
-import { fireEvent, getElement } from '@kot-shrodingera-team/config/util';
+import { getElement, fireEvent, log } from '@kot-shrodingera-team/germes-utils';
 
 const changeToStandardBetslip = async (): Promise<boolean> => {
   const qbsStakeInput = document.querySelector(
     '.qbs-StakeBox_StakeInput'
   ) as HTMLElement;
   if (!qbsStakeInput) {
-    worker.Helper.WriteLine('Не найдена кнопка ввода суммы в мобильном купоне');
+    log('Не найдена кнопка ввода суммы в мобильном купоне', 'crimson');
     return false;
   }
   qbsStakeInput.click();
   const qbsAddToBetslipButton = await getElement('.qbs-AddToBetslipButton');
   if (!qbsAddToBetslipButton) {
-    worker.Helper.WriteLine(
-      'Не найдена кнопка переключения купона на стандартный'
-    );
+    log('Не найдена кнопка переключения купона на стандартный', 'crimson');
     return false;
   }
   fireEvent(qbsAddToBetslipButton, 'touchstart', TouchEvent);

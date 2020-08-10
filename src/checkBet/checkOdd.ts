@@ -1,5 +1,5 @@
-import { caseInsensitiveCompare, ri } from '@kot-shrodingera-team/config/util';
-import WorkerBetObject from '@kot-shrodingera-team/config/workerBetObject';
+import { ri, log } from '@kot-shrodingera-team/germes-utils';
+import WorkerBetObject from '@kot-shrodingera-team/worker-declaration/workerBetObject';
 import {
   formatParameterRegex,
   getHandicapScoreOffset,
@@ -9,9 +9,7 @@ import {
 } from './util';
 import getSiteTeamNames from './getSiteTeamNames';
 
-const cicmp = caseInsensitiveCompare;
-
-type checkOddData = {
+type CheckOddData = {
   error: boolean;
   parameter: number;
   errorMessage: string;
@@ -26,7 +24,7 @@ type checkOddData = {
 const getCheckOdd = (
   betslipBetDetails: string,
   betslipBetDescription: string
-): checkOddData => {
+): CheckOddData => {
   const teamNames = getSiteTeamNames();
   const teamRegex = ri`${teamNames.teamOne}|${teamNames.teamTwo}`;
   // Да, в конце бывает пробел
@@ -39,20 +37,18 @@ const getCheckOdd = (
     period,
     subperiod,
     // overtimeType,
-  } = worker.GetSessionData('dev')
-    ? (JSON.parse(worker.GetSessionData('ForkObj')) as WorkerBetObject)
-    : (JSON.parse(worker.ForkObj) as WorkerBetObject);
-  const error = (errorMessage: string): checkOddData => ({
+  } = JSON.parse(worker.ForkObj) as WorkerBetObject;
+  const error = (errorMessage: string): CheckOddData => ({
     error: true,
     parameter: null,
     errorMessage,
   });
-  const success = (parameter: number): checkOddData => ({
+  const success = (parameter: number): CheckOddData => ({
     error: false,
     parameter,
     errorMessage: null,
   });
-  if (cicmp(market, 'ML')) {
+  if (/^ML$/i.test(market)) {
     if (worker.SportId === 2) {
       let betslipResultRegex;
       if (period === 0) {
@@ -68,12 +64,12 @@ const getCheckOdd = (
       if (!betslipMatch) {
         return error('В купоне неподходящая роспись');
       }
-      if (cicmp(odd, 'ML1')) {
-        if (!cicmp(betslipMatch[1], teamNames.teamOne)) {
+      if (/^ML1$/i.test(odd)) {
+        if (!ri`${betslipMatch[1]}`.test(teamNames.teamOne)) {
           return error('Открыта не победа первого игрока');
         }
-      } else if (cicmp(odd, 'ML2')) {
-        if (!cicmp(betslipMatch[1], teamNames.teamTwo)) {
+      } else if (/^ML2$/i.test(odd)) {
+        if (!ri`${betslipMatch[1]}`.test(teamNames.teamTwo)) {
           return error('Открыта не победа второго игрока');
         }
       } else {
@@ -97,20 +93,20 @@ const getCheckOdd = (
       return success(-6666);
     }
   }
-  if (cicmp(market, 'F')) {
+  if (/^F$/i.test(market)) {
     if (worker.SportId === 1) {
-      if (cicmp('Draw No Bet', betslipBetDetails)) {
+      if (/^Draw No Bet$/i.test(betslipBetDetails)) {
         if (param !== 0) {
           return error(
             'Открыта фора 0 (Draw No Bet), но в росписи бота не фора 0'
           );
         }
-        if (cicmp(odd, 'F1')) {
-          if (!cicmp(teamNames.teamOne, betslipBetDescription)) {
+        if (/^F1$/i.test(odd)) {
+          if (!ri`${teamNames.teamOne}`.test(betslipBetDescription)) {
             return error('Открыта не победа первой команды');
           }
-        } else if (cicmp(odd, 'F2')) {
-          if (!cicmp(teamNames.teamTwo, betslipBetDescription)) {
+        } else if (/^F2$/i.test(odd)) {
+          if (!ri`${teamNames.teamTwo}`.test(betslipBetDescription)) {
             return error('Открыта не победа второй команды');
           }
         } else {
@@ -125,12 +121,12 @@ const getCheckOdd = (
       if (!betslipMatch) {
         return error('В купоне неподходящая роспись');
       }
-      if (cicmp(odd, 'F1')) {
-        if (!cicmp(betslipMatch[2], teamNames.teamOne)) {
+      if (/^F1$/i.test(odd)) {
+        if (!ri`${betslipMatch[2]}`.test(teamNames.teamOne)) {
           return error('Открыта фора не на первую команду');
         }
-      } else if (cicmp(odd, 'F2')) {
-        if (!cicmp(betslipMatch[2], teamNames.teamTwo)) {
+      } else if (/^F2$/i.test(odd)) {
+        if (!ri`${betslipMatch[2]}`.test(teamNames.teamTwo)) {
           return error('Открыта фора не на вторую команду');
         }
       } else {
@@ -140,7 +136,7 @@ const getCheckOdd = (
       if (handicapOffset === null) {
         return error(`Не удалось распаристь счёт - ${betslipMatch[1]}`);
       }
-      if (cicmp(betslipMatch[2], teamNames.teamOne)) {
+      if (ri`${betslipMatch[2]}`.test(teamNames.teamTwo)) {
         handicapOffset = -handicapOffset;
       }
       return success(handicapOffset + parseParameter(betslipMatch[3]));
@@ -153,12 +149,12 @@ const getCheckOdd = (
       if (!betslipMatch) {
         return error('В купоне неподходящая роспись');
       }
-      if (cicmp(odd, 'F1')) {
-        if (!cicmp(betslipMatch[1], teamNames.teamOne)) {
+      if (/^F1$/i.test(odd)) {
+        if (!ri`${betslipMatch[1]}`.test(teamNames.teamOne)) {
           return error('Открыта фора не на первого игрока');
         }
-      } else if (cicmp(odd, 'F2')) {
-        if (!cicmp(betslipMatch[1], teamNames.teamTwo)) {
+      } else if (/^F2$/i.test(odd)) {
+        if (!ri`${betslipMatch[2]}`.test(teamNames.teamTwo)) {
           return error('Открыта фора не на второго игрока');
         }
       } else {
@@ -170,17 +166,17 @@ const getCheckOdd = (
       return success(parseParameter(betslipMatch[3]));
     }
   }
-  // if (cicmp(market, '1X2')) {
-  //   if (cicmp(odd, '1')) {
-  //     if (!cicmp(teamNames.teamOne, betslipBetDescription)) {
+  // if (/^1X2$/i.test(market)) {
+  //   if (/^1$/i.test(odd)) {
+  //     if (!ri`${teamNames.teamOne}`.test(betslipBetDescription)) {
   //       return error('Открыта не победа первой команды');
   //     }
-  //   } else if (cicmp(odd, '2')) {
-  //     if (!cicmp(teamNames.teamTwo, betslipBetDescription)) {
+  //   } else if (/^2$/i.test(odd)) {
+  //     if (!ri`${teamNames.teamTwo}`.test(betslipBetDescription)) {
   //       return error('Открыта не победа второй команды');
   //     }
-  //   } else if (cicmp(odd, 'X')) {
-  //     if (!cicmp('Draw', betslipBetDescription)) {
+  //   } else if (/^X$/i.test(odd)) {
+  //     if (!/Draw/i.test(betslipBetDescription)) {
   //       return error('Открыта не ничья');
   //     }
   //   } else {
@@ -188,7 +184,7 @@ const getCheckOdd = (
   //   }
   //   return success(-6666);
   // }
-  if (cicmp(market, 'OU')) {
+  if (/^OU$/i.test(market)) {
     if (worker.SportId === 1) {
       let betslipTotalRegex;
       if (betslipBetDetails.includes('Goal Line')) {
@@ -208,12 +204,12 @@ const getCheckOdd = (
       if (!betslipMatch) {
         return error('В купоне неподходящая роспись');
       }
-      if (cicmp(odd, 'TO')) {
-        if (!cicmp(betslipMatch[1], 'over')) {
+      if (/^TO$/i.test(odd)) {
+        if (!/^over$/i.test(betslipMatch[1])) {
           return error('Открыт не тотал больше');
         }
-      } else if (cicmp(odd, 'TU')) {
-        if (!cicmp(betslipMatch[1], 'under')) {
+      } else if (/^TU$/i.test(odd)) {
+        if (!/^under$/i.test(betslipMatch[1])) {
           return error('Открыт не тотал меньше');
         }
       } else {
@@ -230,12 +226,12 @@ const getCheckOdd = (
       if (!betslipMatch) {
         return error('В купоне неподходящая роспись');
       }
-      if (cicmp(odd, 'TO')) {
-        if (!cicmp(betslipMatch[1], 'over')) {
+      if (/^TO$/i.test(odd)) {
+        if (!/^over$/i.test(betslipMatch[1])) {
           return error('Открыт не тотал больше');
         }
-      } else if (cicmp(odd, 'TU')) {
-        if (!cicmp(betslipMatch[1], 'under')) {
+      } else if (/^TU$/i.test(odd)) {
+        if (!/^under$/i.test(betslipMatch[1])) {
           return error('Открыт не тотал меньше');
         }
       } else {
@@ -247,7 +243,7 @@ const getCheckOdd = (
       return success(parseParameter(betslipMatch[2]));
     }
   }
-  if (cicmp(market, 'OU1') || cicmp(market, 'OU2')) {
+  if (/^OU[12]$/i.test(market)) {
     if (worker.SportId === 1) {
       const betslipTeamTotalRegex = ri`^(${teamRegex}) - (Over|Under) (${formatParameterRegex(
         { sign: false, double: false }
@@ -256,21 +252,21 @@ const getCheckOdd = (
       if (!betslipMatch) {
         return error('В купоне неподходящая роспись');
       }
-      if (cicmp(market, 'OU1')) {
-        if (!cicmp(betslipMatch[1], teamNames.teamOne)) {
+      if (/^OU1$/i.test(market)) {
+        if (!ri`${betslipMatch[1]}`.test(teamNames.teamOne)) {
           return error('Открыт не тотал первой команды');
         }
-      } else if (cicmp(market, 'OU2')) {
-        if (!cicmp(betslipMatch[1], teamNames.teamTwo)) {
+      } else if (/^OU2$/i.test(market)) {
+        if (!ri`${betslipMatch[1]}`.test(teamNames.teamTwo)) {
           return error('Открыт не тотал второй команды');
         }
       }
-      if (cicmp(odd, 'TO')) {
-        if (!cicmp(betslipMatch[2], 'over')) {
+      if (/^TO$/i.test(odd)) {
+        if (!/^over$/i.test(betslipMatch[2])) {
           return error('Открыт не тотал больше');
         }
-      } else if (cicmp(odd, 'TU')) {
-        if (!cicmp(betslipMatch[2], 'under')) {
+      } else if (/^TU$/i.test(odd)) {
+        if (!/^under$/i.test(betslipMatch[2])) {
           return error('Открыт не тотал меньше');
         }
       } else {
@@ -286,21 +282,21 @@ const getCheckOdd = (
       if (!betslipMatch) {
         return error('В купоне неподходящая роспись');
       }
-      if (cicmp(market, 'OU1')) {
-        if (!cicmp(betslipMatch[1], teamNames.teamOne)) {
+      if (/^OU1$/i.test(market)) {
+        if (!ri`${betslipMatch[1]}`.test(teamNames.teamOne)) {
           return error('Открыт не тотал первого игрока');
         }
-      } else if (cicmp(market, 'OU2')) {
-        if (!cicmp(betslipMatch[1], teamNames.teamTwo)) {
+      } else if (/^OU2$/i.test(market)) {
+        if (!ri`${betslipMatch[1]}`.test(teamNames.teamTwo)) {
           return error('Открыта не тотал второго игрока');
         }
       }
-      if (cicmp(odd, 'TO')) {
-        if (!cicmp(betslipMatch[2], 'over')) {
+      if (/^TO$/i.test(odd)) {
+        if (!/^over$/i.test(betslipMatch[2])) {
           return error('Открыт не тотал больше');
         }
-      } else if (cicmp(odd, 'TU')) {
-        if (!cicmp(betslipMatch[2], 'under')) {
+      } else if (/^TU$/i.test(odd)) {
+        if (!/^under$/i.test(betslipMatch[2])) {
           return error('Открыт не тотал меньше');
         }
       } else {
@@ -309,12 +305,12 @@ const getCheckOdd = (
       return success(parseParameter(betslipMatch[3]));
     }
   }
-  if (cicmp(market, 'DC')) {
-    if (cicmp(odd, '1X')) {
+  if (/^DC$/i.test(market)) {
+    if (/^1X$/i.test(odd)) {
       if (!ri`${teamNames.teamOne} or Draw$`.test(betslipBetDescription)) {
         return error('Открыт не двойной шанс 1X');
       }
-    } else if (cicmp(odd, '12')) {
+    } else if (/^12$/i.test(odd)) {
       if (
         !ri`^${teamNames.teamOne} or ${teamNames.teamTwo}$`.test(
           betslipBetDescription
@@ -322,7 +318,7 @@ const getCheckOdd = (
       ) {
         return error('Открыт не двойной шанс 12');
       }
-    } else if (cicmp(odd, 'X2')) {
+    } else if (/^X2$/i.test(odd)) {
       if (!ri`^${teamNames.teamTwo} or Draw$`.test(betslipBetDescription)) {
         return error('Открыт не двойной шанс X2');
       }
@@ -331,7 +327,7 @@ const getCheckOdd = (
     }
     return success(-6666);
   }
-  if (cicmp(market, 'EH')) {
+  if (/^EH$/i.test(market)) {
     if (worker.SportId === 1) {
       const betslipEHandicapRegex = ri`^(${eHandicapTeamRegex}) (${formatParameterRegex(
         { sign: true, double: false }
@@ -340,15 +336,15 @@ const getCheckOdd = (
       if (!betslipMatch) {
         return error('В купоне неподходящая роспись');
       }
-      if (cicmp(odd, 'EH1')) {
-        if (!cicmp(betslipMatch[1], teamNames.teamOne)) {
+      if (/^EH1$/i.test(odd)) {
+        if (!ri`${betslipMatch[1]}`.test(teamNames.teamOne)) {
           return error('Открыт не европейский гандикап на первую команду');
         }
-      } else if (cicmp(odd, 'EH2')) {
-        if (!cicmp(betslipMatch[1], teamNames.teamTwo)) {
+      } else if (/^EH2$/i.test(odd)) {
+        if (!ri`${betslipMatch[1]}`.test(teamNames.teamTwo)) {
           return error('Открыт не европейский гандикап на вторую команду');
         }
-      } else if (cicmp(odd, 'EHX')) {
+      } else if (/^EHX$/i.test(odd)) {
         if (!ri`Draw \(${teamNames.teamTwo} ?\)`.test(betslipMatch[1])) {
           return error('Открыт не европейский гандикап на ничью');
         }
@@ -358,18 +354,18 @@ const getCheckOdd = (
       return success(parseParameter(betslipMatch[2]));
     }
   }
-  if (cicmp(market, 'BTS')) {
+  if (/^BTS$/i.test(market)) {
     const betslipBtsRegex = /^(Yes|No)$/i;
     const betslipMatch = betslipBetDescription.match(betslipBtsRegex);
     if (!betslipMatch) {
       return error('В купоне неподходящая роспись');
     }
-    if (cicmp(odd, 'Y')) {
-      if (!cicmp(betslipMatch[1], 'Yes')) {
+    if (/^Y$/i.test(odd)) {
+      if (!/^Yes$/i.test(betslipMatch[1])) {
         return error('Открыт не BTS - Yes');
       }
-    } else if (cicmp(odd, 'N')) {
-      if (!cicmp(betslipMatch[1], 'No')) {
+    } else if (/^N$/i.test(odd)) {
+      if (!/^No$/i.test(betslipMatch[1])) {
         return error('Открыт не BTS - No');
       }
     } else {
@@ -377,7 +373,7 @@ const getCheckOdd = (
     }
     return success(-6666);
   }
-  if (cicmp(market, 'CNR_OU')) {
+  if (/^CNR_OU$/i.test(market)) {
     if (worker.SportId === 1) {
       let parameterOffset = 0;
       if (
@@ -385,14 +381,16 @@ const getCheckOdd = (
           betslipBetDetails
         )
       ) {
-        if (cicmp(odd, 'TO')) {
-          worker.Helper.WriteLine(
-            'Открыт 3-Way тотал больше, добавляем 0.5 к параметру'
+        if (/^TO$/i.test(odd)) {
+          log(
+            'Открыт 3-Way тотал больше, добавляем 0.5 к параметру',
+            'steelbue'
           );
           parameterOffset = 0.5;
-        } else if (cicmp(odd, 'TU')) {
-          worker.Helper.WriteLine(
-            'Открыт 3-Way тотал меньше, отнимаем 0.5 от параметра'
+        } else if (/^TU$/i.test(odd)) {
+          log(
+            'Открыт 3-Way тотал меньше, отнимаем 0.5 от параметра',
+            'steelblue'
           );
           parameterOffset = -0.5;
         } else {
@@ -410,12 +408,12 @@ const getCheckOdd = (
         return error('В купоне неподходящая роспись');
       }
       if (odd === 'TO') {
-        if (!cicmp(betslipMatch[1], 'over')) {
+        if (!/^over$/i.test(betslipMatch[1])) {
           return error('Открыт не тотал больше');
         }
       }
       if (odd === 'TU') {
-        if (!cicmp(betslipMatch[1], 'under')) {
+        if (!/^under$/i.test(betslipMatch[1])) {
           return error('Открыт не тотал меньше');
         }
       } else {
@@ -424,12 +422,12 @@ const getCheckOdd = (
       return success(parameterOffset + parseParameter(betslipMatch[2]));
     }
   }
-  if (/(TO|TU)/i.test(odd)) {
-    if (cicmp(odd, 'TO')) {
+  if (/^T[OU]$/i.test(odd)) {
+    if (/^TO$/i.test(odd)) {
       if (!/over/i.test(betslipBetDescription)) {
         return error('Открыт не тотал больше');
       }
-    } else if (cicmp(odd, 'TU')) {
+    } else if (/^TU$/i.test(odd)) {
       if (!/under/i.test(betslipBetDescription)) {
         return error('Открыт не тотал меньше');
       }
@@ -441,33 +439,34 @@ const getCheckOdd = (
     }
     let parameter = parseParameter(betslipMatch[1]);
     if (!Number.isInteger(param) && Number.isInteger(parameter)) {
-      worker.Helper.WriteLine(
-        'В росписи бота параметр не целый, а в росписи бетки целый. Отнимаем 0.5 от параметра'
+      log(
+        'В росписи бота параметр не целый, а в росписи бетки целый. Отнимаем 0.5 от параметра',
+        'steelblue'
       );
       parameter -= 0.5;
     }
     return success(parameter);
   }
-  if (/(1|ML1|F1)/i.test(odd)) {
+  if (/^(1|ML1|F1)$/i.test(odd)) {
     if (!ri`${teamNames.teamOne}`.test(betslipBetDescription)) {
       error(
         'Ставка на первую команду/игрока, но в купоне нет названия первой команды/игрока'
       );
     }
   }
-  if (/(2|ML2|F2)/i.test(odd)) {
+  if (/^(2|ML2|F2)$/i.test(odd)) {
     if (!ri`${teamNames.teamTwo}`.test(betslipBetDescription)) {
       error(
         'Ставка на вторую команду/игрока, но в купоне нет названия второй команды/игрока'
       );
     }
   }
-  if (/(ODD|EVEN)/i.test(odd)) {
-    if (cicmp(odd, 'ODD')) {
+  if (/^(ODD|EVEN)$/i.test(odd)) {
+    if (/^ODD$/i.test(odd)) {
       if (!/Odd/i.test(betslipBetDescription)) {
         return error('Открыт не тотал нечётный');
       }
-    } else if (cicmp(odd, 'EVEN')) {
+    } else if (/^EVEN$/i.test(odd)) {
       if (!/Even/i.test(betslipBetDescription)) {
         return error('Открыт не тотал чётный');
       }

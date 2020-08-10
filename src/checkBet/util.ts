@@ -1,4 +1,4 @@
-import { ri } from '@kot-shrodingera-team/config/util';
+import { ri } from '@kot-shrodingera-team/germes-utils';
 
 export const getTennisCompletedSetsCount = (): number => {
   const setScore = [
@@ -42,7 +42,7 @@ export const getTennisCompletedSetsGamesCount = (): number => {
 export const getHandicapScoreOffset = (score: string): number => {
   const match = score.match(/\((\d+)-(\d+)\)/);
   if (!match) {
-    // worker.Helper.WriteLine(`Не удалось распаристь счёт - ${score}`);
+    // log(`Не удалось распаристь счёт: "${score}"`, 'crimson');
     return null;
   }
   const left = parseInt(match[1], 10);
@@ -60,7 +60,7 @@ export const parseParameter = (parameter: string): number => {
   if (/^[+-]?\d+\.\d+$/.test(parameter)) {
     return Number(parameter);
   }
-  // worker.Helper.WriteLine(`Не удалось спарсить параметр форы - ${parameter}`);
+  // log(`Не удалось спарсить параметр форы: "${parameter}"`, 'crimson');
   return null;
 };
 

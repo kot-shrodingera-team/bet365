@@ -1,41 +1,33 @@
-import WorkerBetObject from '@kot-shrodingera-team/config/workerBetObject';
-import {
-  betslipBetDescriptionSelector,
-  betslipBetHandicapSelector,
-  betslipBetDetailsSelector,
-} from '../selectors';
+import WorkerBetObject from '@kot-shrodingera-team/worker-declaration/workerBetObject';
+import { log } from '@kot-shrodingera-team/germes-utils';
 import getCheckMarket from './checkMarket';
 import getCheckOdd from './checkOdd';
 import getCurrentEventName from './getCurrentEventName';
 
-type checkBetObject = { parameter: number; correctness: boolean };
+type CheckBetObject = { parameter: number; correctness: boolean };
 
-const checkBet = (log = false): checkBetObject => {
-  const badBet = (): checkBetObject => ({
+const checkBet = (logResult = false): CheckBetObject => {
+  const badBet = (): CheckBetObject => ({
     parameter: -9999,
     correctness: false,
   });
-  const goodBet = (parameter = -6666): checkBetObject => ({
+  const goodBet = (parameter = -6666): CheckBetObject => ({
     parameter,
     correctness: true,
   });
 
   const betslipBetDescriptionElement = document.querySelector(
-    betslipBetDescriptionSelector
+    '.bss-NormalBetItem_Title'
   );
   if (!betslipBetDescriptionElement) {
-    worker.Helper.WriteLine(
-      'Ошибка проверки росписи купона: Не найдена роспись'
-    );
+    log('Ошибка проверки росписи купона: не найдена роспись', 'crimson');
     return badBet();
   }
   const betslipBetDetailsElement = document.querySelector(
-    betslipBetDetailsSelector
+    '.bss-NormalBetItem_Market'
   );
   if (!betslipBetDetailsElement) {
-    worker.Helper.WriteLine(
-      'Ошибка проверки росписи купона: Не найдена вторая роспись'
-    );
+    log('Ошибка проверки росписи купона: не найдена вторая роспись', 'crimson');
     return badBet();
   }
   let betslipBetDescription = betslipBetDescriptionElement.textContent.trim();
@@ -43,7 +35,7 @@ const checkBet = (log = false): checkBetObject => {
   // Бывало, что параметр гандикапа указывался сразу после ставки, без пробела
   // Это нужно нормализировать
   const betslipBetHandicapElement = document.querySelector(
-    betslipBetHandicapSelector
+    '.bss-NormalBetItem_Handicap'
   );
   if (betslipBetHandicapElement) {
     const betslipBetHandicap = betslipBetHandicapElement.textContent.trim();
@@ -63,34 +55,27 @@ const checkBet = (log = false): checkBetObject => {
 
   const eventName = getCurrentEventName();
 
-  if (log) {
-    worker.Helper.WriteLine(`Событие '${eventName}'`);
-    worker.Helper.WriteLine(`Маркет '${betslipBetDetails}'`);
-    worker.Helper.WriteLine(`Ставка '${betslipBetDescription}'`);
-    worker.Helper.WriteLine(`Роспись в боте '${worker.BetName}'`);
-    const {
-      market,
-      odd,
-      param,
-      period,
-      subperiod,
-      overtimeType,
-    } = worker.GetSessionData('dev')
-      ? (JSON.parse(worker.GetSessionData('ForkObj')) as WorkerBetObject)
-      : (JSON.parse(worker.ForkObj) as WorkerBetObject);
-    worker.Helper.WriteLine(
-      `market: ${market}, odd: ${odd}, param: ${param}, period: ${period}, subperiod: ${subperiod}, overtimeType: ${overtimeType}`
-    );
+  if (logResult) {
+    const { market, odd, param, period, subperiod, overtimeType } = JSON.parse(
+      worker.ForkObj
+    ) as WorkerBetObject;
+    const message =
+      `Событие: "${eventName}"\n` +
+      `Маркет: "${betslipBetDetails}"\n` +
+      `Ставка: "${betslipBetDescription}"\n` +
+      `Роспись в боте: "${worker.BetName.trim()}"\n` +
+      `market: ${market}, odd: ${odd}, param: ${param}, period: ${period}, subperiod: ${subperiod}, overtimeType: ${overtimeType}`;
+    log(message, 'lightgrey');
   }
 
   const checkMarket = getCheckMarket(betslipBetDetails);
   if (checkMarket.error) {
-    worker.Helper.WriteLine(checkMarket.errorMessage);
+    log(checkMarket.errorMessage, 'crimson');
     return badBet();
   }
   const checkOdd = getCheckOdd(betslipBetDetails, betslipBetDescription);
   if (checkOdd.error) {
-    worker.Helper.WriteLine(checkOdd.errorMessage);
+    log(checkOdd.errorMessage, 'crimson');
     return badBet();
   }
   return goodBet(checkOdd.parameter);

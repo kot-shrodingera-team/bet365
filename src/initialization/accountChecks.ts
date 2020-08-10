@@ -1,31 +1,39 @@
-import { getElement } from '@kot-shrodingera-team/config/util';
-import { myBetsFilterButtonsSelector, betslipAlertMessage } from './selectors';
+import { getElement, log } from '@kot-shrodingera-team/germes-utils';
 
-export const checkCashOutEnabled = async (timeout = 1000): Promise<number> => {
-  window.location.href = `${window.location.origin}/#/MB/`;
-  await getElement(myBetsFilterButtonsSelector, timeout);
+export const checkCashOutEnabled = async (timeout = 5000): Promise<number> => {
+  window.location.href = new URL('/#/MB', window.location.origin).href;
+  await getElement('.myb-MyBetsHeader_Button', timeout);
   const myBetsFilterButtons = [
-    ...document.querySelectorAll(myBetsFilterButtonsSelector),
+    ...document.querySelectorAll('.myb-MyBetsHeader_Button'),
   ];
   if (myBetsFilterButtons.length === 0) {
-    worker.Helper.WriteLine('Не найдены кнопки фильтров истории ставок');
+    log(
+      'Ошибка проверки порезки аккаунта: не найдены кнопки фильтров истории ставок',
+      'crimson'
+    );
+    window.location.href = new URL('/#/IP', window.location.origin).href;
     return 0;
   }
-  console.log(myBetsFilterButtons);
   const cashOutFilterButton = myBetsFilterButtons.find(
     (button) => button.textContent === 'Cash Out'
   );
   if (!cashOutFilterButton) {
-    worker.Helper.WriteLine('Не найдена кнопка фильтра Cash Out');
+    log(
+      'Ошибка проверки порезки аккаунта: не найдена кнопка фильтра Cash Out',
+      'crimson'
+    );
+    window.location.href = new URL('/#/IP', window.location.origin).href;
     return 0;
   }
   const cashOutEnabled = ![...cashOutFilterButton.classList].includes('Hidden');
-  window.location.href = `${window.location.origin}/#/IP/`;
+  window.location.href = new URL('/#/IP', window.location.origin).href;
   return cashOutEnabled ? 1 : -1;
 };
 
 export const checkRestriction = (): boolean => {
-  const betErrorMessageElement = document.querySelector(betslipAlertMessage);
+  const betErrorMessageElement = document.querySelector(
+    '.bss-Footer_MessageBody'
+  );
   if (betErrorMessageElement) {
     const betErrorMessage = betErrorMessageElement.textContent.trim();
     const restrictedAccountMessage =
@@ -46,31 +54,30 @@ export const accountBlocked = (): void => {
     worker.SetBookmakerPaused && worker.SetBookmakerPaused(true)
       ? 'Аккаунт Bet365 заблокирован! Bet365 поставлен на паузу'
       : 'Аккаунт Bet365 заблокирован! Bet365 НЕ поставлен на паузу. Поставьте на паузу вручную';
-  worker.Helper.WriteLine(message);
+  log(message, 'red');
   worker.Helper.SendInformedMessage(message);
 };
 
 export const accountLimited = (): void => {
-  worker.Helper.WriteLine('Порезанный аккаунт (отсутствует Cash Out)');
   if (
     !worker.GetSessionData ||
     worker.GetSessionData('Bet365 LimitedAccountInformed') !== '1'
   ) {
-    const limitedAccountMessage =
-      'В Bet365 порезанный аккаунт (отсутствует Cash Out)';
-    worker.Helper.SendInformedMessage(limitedAccountMessage);
+    const message = (() => {
+      let text = 'В Bet365 порезанный аккаунт (отсутствует Cash Out)';
+      if (worker.PauseOnLimitedAccount) {
+        if (worker.SetBookmakerPaused && worker.SetBookmakerPaused(true)) {
+          text += '. Bet365 поставлен на паузу';
+        } else {
+          text += '. Bet365 НЕ поставлен на паузу. Поставьте на паузу вручную';
+        }
+      }
+      return text;
+    })();
     if (worker.GetSessionData) {
       worker.SetSessionData('Bet365 LimitedAccountInformed', '1');
     }
-  }
-  if (worker.PauseOnLimitedAccount) {
-    if (worker.SetBookmakerPaused && worker.SetBookmakerPaused(true)) {
-      const pauseMessage = 'Bet365 поставлен на паузу';
-      worker.Helper.WriteLine(pauseMessage);
-      worker.Helper.SendInformedMessage(pauseMessage);
-    }
-    if (worker.IsShowStake) {
-      worker.JSFail();
-    }
+    log(message, 'crimson');
+    worker.Helper.SendInformedMessage(message);
   }
 };

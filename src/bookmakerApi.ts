@@ -28,9 +28,8 @@ interface Locator {
 }
 
 declare global {
-  // eslint-disable-next-line no-redeclare
   const Locator: Locator;
-  // eslint-disable-next-line no-redeclare, @typescript-eslint/camelcase
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const ns_favouriteslib_ui: unknown;
 }
 

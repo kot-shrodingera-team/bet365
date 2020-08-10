@@ -1,8 +1,8 @@
 import getCurrentEventName from './getCurrentEventName';
 
-type teamNames = { teamOne: string; teamTwo: string };
+type TeamNames = { teamOne: string; teamTwo: string };
 
-const getSiteTeamNames = (): teamNames => {
+const getSiteTeamNames = (): TeamNames => {
   const eventName = getCurrentEventName();
   let eventTeams = eventName.split(' v ');
   if (eventTeams.length !== 2) {

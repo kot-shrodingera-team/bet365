@@ -1,44 +1,26 @@
-import './workerCheck';
-import './globalDefines/request';
-import './bookmakerApi';
-import { pipeHwlToConsole, checkUrl } from '@kot-shrodingera-team/config/util';
-import getStakeInfo from './callbacks/getStakeInfo';
-import setStakeSum from './callbacks/setStakeSum';
-import doStake from './callbacks/doStake';
-import checkCouponLoading from './callbacks/checkCouponLoading';
-import checkStakeStatus from './callbacks/checkStakeStatus';
-import authorize from './authorize';
-import showStake, { clearReloadCount, clearCashoutChecked } from './showStake';
-import { clearTempMaximumStake } from './stakeInfo/getMaximumStake';
-import afterSuccesfulStake from './callbacks/afterSuccesfulStake';
-import { inPlayControlBarSelector } from './selectors';
+import '@kot-shrodingera-team/worker-declaration/workerCheck';
+import { log } from '@kot-shrodingera-team/germes-utils';
+import getStakeInfo from './worker_callbacks/getStakeInfo';
+import setStakeSum from './worker_callbacks/setStakeSum';
+import doStake from './worker_callbacks/doStake';
+import checkCouponLoading from './worker_callbacks/checkCouponLoading';
+import checkStakeStatus from './worker_callbacks/checkStakeStatus';
+import afterSuccesfulStake from './worker_callbacks/afterSuccesfulStake';
+import showStake from './show_stake';
+import fastLoad from './fastLoad';
+import initialize from './initialization';
 
-pipeHwlToConsole();
-clearReloadCount();
-
-const FastLoad = async (): Promise<void> => {
-  clearReloadCount();
-  clearTempMaximumStake();
-  clearCashoutChecked();
-  worker.Helper.WriteLine('Быстрая загрузка');
-
-  if (!document.querySelector(inPlayControlBarSelector)) {
-    if (checkUrl()) {
-      worker.Helper.WriteLine(
-        'Открыта другая страница Bet365. Переходим на In-Play'
-      );
-      window.location.href = `${worker.BookmakerMainUrl}#/IP/`;
-    } else {
-      worker.Helper.WriteLine('Открыт другой сайт. Возвращаемся на Bet365');
-      window.location.href = `${worker.BookmakerMainUrl}#/IP/`;
-      return;
-    }
+(async (): Promise<void> => {
+  log(`Загрузка страницы`, 'steelblue');
+  if (!worker.IsShowStake) {
+    initialize();
+  } else {
+    showStake();
   }
-  showStake();
-};
+})();
 
 worker.SetCallBacks(
-  console.log,
+  log,
   getStakeInfo,
   setStakeSum,
   doStake,
@@ -46,13 +28,5 @@ worker.SetCallBacks(
   checkStakeStatus,
   afterSuccesfulStake
 );
-worker.SetFastCallback(FastLoad);
 
-(async (): Promise<void> => {
-  worker.Helper.WriteLine('Начали');
-  if (!worker.IsShowStake) {
-    authorize();
-  } else {
-    showStake();
-  }
-})();
+worker.SetFastCallback(fastLoad);

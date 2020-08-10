@@ -1,14 +1,11 @@
-import { caseInsensitiveCompare } from '@kot-shrodingera-team/config/util';
-import WorkerBetObject from '@kot-shrodingera-team/config/workerBetObject';
+import WorkerBetObject from '@kot-shrodingera-team/worker-declaration/workerBetObject';
 
-type checkMarketData = {
+type CheckMarketData = {
   error: boolean;
   errorMessage: string;
 };
 
-const cicmp = caseInsensitiveCompare;
-
-const getCheckMarket = (betslipBetDetails: string): checkMarketData => {
+const getCheckMarket = (betslipBetDetails: string): CheckMarketData => {
   const {
     market,
     // odd,
@@ -19,15 +16,15 @@ const getCheckMarket = (betslipBetDetails: string): checkMarketData => {
   } = worker.GetSessionData('dev')
     ? (JSON.parse(worker.GetSessionData('ForkObj')) as WorkerBetObject)
     : (JSON.parse(worker.ForkObj) as WorkerBetObject);
-  const error = (errorMessage: string): checkMarketData => ({
+  const error = (errorMessage: string): CheckMarketData => ({
     error: true,
     errorMessage,
   });
-  const success = (): checkMarketData => ({
+  const success = (): CheckMarketData => ({
     error: false,
     errorMessage: null,
   });
-  if (cicmp(market, 'ML')) {
+  if (/^ML$/i.test(market)) {
     if (worker.SportId === 2) {
       if (period === 0) {
         if (!/^Match Winner$/i.test(betslipBetDetails)) {
@@ -46,7 +43,7 @@ const getCheckMarket = (betslipBetDetails: string): checkMarketData => {
       }
     }
     //
-  } else if (cicmp(market, 'F')) {
+  } else if (/^F$/i.test(market)) {
     if (worker.SportId === 1) {
       if (period === 0) {
         if (
@@ -90,7 +87,7 @@ const getCheckMarket = (betslipBetDetails: string): checkMarketData => {
         return error(`Необрабатываемый период (${period}). Напишите в ТП`);
       }
     }
-  } else if (cicmp(market, '1X2')) {
+  } else if (/^1X2$/i.test(market)) {
     if (worker.SportId === 1) {
       if (period === 0) {
         if (!/^Fulltime Result$/i.test(betslipBetDetails)) {
@@ -108,7 +105,7 @@ const getCheckMarket = (betslipBetDetails: string): checkMarketData => {
         return error(`Необрабатываемый период (${period}). Напишите в ТП`);
       }
     }
-  } else if (cicmp(market, 'OU')) {
+  } else if (/^OU$/i.test(market)) {
     if (worker.SportId === 1) {
       if (period === 0) {
         if (
@@ -154,14 +151,14 @@ const getCheckMarket = (betslipBetDetails: string): checkMarketData => {
         return error(`Необрабатываемый период (${period}). Напишите в ТП`);
       }
     }
-  } else if (cicmp(market, 'OU1') || cicmp(market, 'OU2')) {
+  } else if (/^OU[12]$/i.test(market)) {
     if (worker.SportId === 1) {
       if (period === 0) {
-        if (cicmp(market, 'OU1')) {
+        if (/^OU1$/i.test(market)) {
           if (!/^Home Team Goals$/i.test(betslipBetDetails)) {
             return error('Открыт не тотал первой команды');
           }
-        } else if (cicmp(market, 'OU2')) {
+        } else if (/^OU2$/i.test(market)) {
           if (!/^Away Team Goals$/i.test(betslipBetDetails)) {
             return error('Открыт не тотал второй команды');
           }
@@ -184,7 +181,7 @@ const getCheckMarket = (betslipBetDetails: string): checkMarketData => {
         );
       }
     }
-  } else if (cicmp(market, 'DC')) {
+  } else if (/^DC$/i.test(market)) {
     if (worker.SportId === 1) {
       if (period === 0) {
         if (!/^Double Chance$/i.test(betslipBetDetails)) {
@@ -202,7 +199,7 @@ const getCheckMarket = (betslipBetDetails: string): checkMarketData => {
         return error(`Необрабатываемый период (${period}). Напишите в ТП`);
       }
     }
-  } else if (cicmp(market, 'EH')) {
+  } else if (/^EH$/i.test(market)) {
     if (worker.SportId === 1) {
       if (period === 0) {
         if (!/^(Alternative )?3-Way Handicap$/i.test(betslipBetDetails)) {
@@ -222,7 +219,7 @@ const getCheckMarket = (betslipBetDetails: string): checkMarketData => {
         return error(`Необрабатываемый период (${period}). Напишите в ТП`);
       }
     }
-  } else if (cicmp(market, 'BTS')) {
+  } else if (/^BTS$/i.test(market)) {
     if (worker.SportId === 1) {
       if (period === 0) {
         if (!/^Both Teams to Score$/i.test(betslipBetDetails)) {
@@ -240,11 +237,11 @@ const getCheckMarket = (betslipBetDetails: string): checkMarketData => {
         return error(`Необрабатываемый период (${period}). Напишите в ТП`);
       }
     }
-  } else if (cicmp(market, 'CNR_F')) {
+  } else if (/^CNR_F$/i.test(market)) {
     return error(
       'На Bet365 нет фор на угловые. Если это фора на угловые, скиньте скрин в ТП'
     );
-  } else if (cicmp(market, 'CNR_OU')) {
+  } else if (/^CNR_OU$/i.test(market)) {
     if (worker.SportId === 1) {
       if (period === 0) {
         if (

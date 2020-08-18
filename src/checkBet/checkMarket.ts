@@ -13,9 +13,7 @@ const getCheckMarket = (betslipBetDetails: string): CheckMarketData => {
     period,
     subperiod,
     overtimeType,
-  } = worker.GetSessionData('dev')
-    ? (JSON.parse(worker.GetSessionData('ForkObj')) as WorkerBetObject)
-    : (JSON.parse(worker.ForkObj) as WorkerBetObject);
+  } = JSON.parse(worker.ForkObj) as WorkerBetObject;
   const error = (errorMessage: string): CheckMarketData => ({
     error: true,
     errorMessage,

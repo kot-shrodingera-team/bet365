@@ -107,7 +107,7 @@ const showStake = async (): Promise<void> => {
   }
   if (typeof ns_favouriteslib_ui === 'undefined') {
     jsFail('Страница не догрузилась');
-    window.location.href = new URL('/#/IP', worker.BookmakerMainUrl).href;
+    window.location.href = new URL('/#/IP/', worker.BookmakerMainUrl).href;
     return;
   }
 
@@ -214,7 +214,7 @@ const showStake = async (): Promise<void> => {
   // const eventUrl = worker.EventUrl;
   // const [eventId] = eventUrl.split('/').slice(-1);
   // window.location.href = new URL(
-  //   `/#/IP/${eventId}`,
+  //   `/#/IP/${eventId}/`,
   //   window.location.origin
   // ).href;
 };

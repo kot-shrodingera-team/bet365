@@ -10,10 +10,10 @@ const fastLoad = async (): Promise<void> => {
   if (!document.querySelector('.ip-ControlBar_ButtonBar')) {
     if (checkUrl()) {
       log('Открыта другая страница Bet365. Переходим на In-Play', 'steelblue');
-      window.location.href = new URL('/#/IP', worker.BookmakerMainUrl).href;
+      window.location.href = new URL('/#/IP/', worker.BookmakerMainUrl).href;
     } else {
       log('Открыт другой сайт. Возвращаемся на Bet365', 'steelblue');
-      window.location.href = new URL('/#/IP', worker.BookmakerMainUrl).href;
+      window.location.href = new URL('/#/IP/', worker.BookmakerMainUrl).href;
       return;
     }
   }

@@ -1,7 +1,7 @@
 import { getElement, log } from '@kot-shrodingera-team/germes-utils';
 
 export const checkCashOutEnabled = async (timeout = 5000): Promise<number> => {
-  window.location.href = new URL('/#/MB', window.location.origin).href;
+  window.location.href = new URL('/#/MB/', window.location.origin).href;
   await getElement('.myb-MyBetsHeader_Button', timeout);
   const myBetsFilterButtons = [
     ...document.querySelectorAll('.myb-MyBetsHeader_Button'),
@@ -11,7 +11,7 @@ export const checkCashOutEnabled = async (timeout = 5000): Promise<number> => {
       'Ошибка проверки порезки аккаунта: не найдены кнопки фильтров истории ставок',
       'crimson'
     );
-    window.location.href = new URL('/#/IP', window.location.origin).href;
+    window.location.href = new URL('/#/IP/', window.location.origin).href;
     return 0;
   }
   const cashOutFilterButton = myBetsFilterButtons.find(
@@ -22,11 +22,11 @@ export const checkCashOutEnabled = async (timeout = 5000): Promise<number> => {
       'Ошибка проверки порезки аккаунта: не найдена кнопка фильтра Cash Out',
       'crimson'
     );
-    window.location.href = new URL('/#/IP', window.location.origin).href;
+    window.location.href = new URL('/#/IP/', window.location.origin).href;
     return 0;
   }
   const cashOutEnabled = ![...cashOutFilterButton.classList].includes('Hidden');
-  window.location.href = new URL('/#/IP', window.location.origin).href;
+  window.location.href = new URL('/#/IP/', window.location.origin).href;
   return cashOutEnabled ? 1 : -1;
 };
 

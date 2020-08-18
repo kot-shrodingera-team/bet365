@@ -1,4 +1,4 @@
-import authCheckReadyGenerator from '@kot-shrodingera-team/germes-generators/initialization/authCheckReady';
+import { authCheckReadyGenerator } from '@kot-shrodingera-team/germes-generators/stake_info/checkAuth';
 
 const authCheckReady = authCheckReadyGenerator({
   authFormSelector: '.hm-MainHeaderRHSLoggedOutWide_Login',

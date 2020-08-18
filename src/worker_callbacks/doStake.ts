@@ -4,7 +4,7 @@ import getCoefficient from '../stake_info/getCoefficient';
 import { clearDoStakeTime } from '../stake_info/doStakeTime';
 import { setIsNewMax } from './checkCouponLoading';
 
-const preAction = (): boolean => {
+const preCheck = (): boolean => {
   const betslipBetCreditsCheckbox = document.querySelector(
     '.bsc-BetCreditsHeader_CheckBox'
   ) as HTMLElement;
@@ -28,7 +28,7 @@ const preAction = (): boolean => {
 };
 
 const doStake = doStakeGenerator({
-  preAction,
+  preCheck,
   doStakeButtonSelector: '.bss-PlaceBetButton',
   getCoefficient,
   clearDoStakeTime,

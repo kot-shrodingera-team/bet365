@@ -62,7 +62,7 @@ const getCheckOdd = (
       }
       const betslipMatch = betslipBetDescription.match(betslipResultRegex);
       if (!betslipMatch) {
-        return error('В купоне неподходящая роспись');
+        return error('В купоне неподходящая роспись (Теннис ML)');
       }
       if (/^ML1$/i.test(odd)) {
         if (!ri`${betslipMatch[1]}`.test(teamNames.teamOne)) {
@@ -119,7 +119,7 @@ const getCheckOdd = (
       )})$`;
       const betslipMatch = betslipBetDescription.match(betslipHandicapRegex);
       if (!betslipMatch) {
-        return error('В купоне неподходящая роспись');
+        return error('В купоне неподходящая роспись (Футбол F)');
       }
       if (/^F1$/i.test(odd)) {
         if (!ri`${betslipMatch[2]}`.test(teamNames.teamOne)) {
@@ -150,7 +150,7 @@ const getCheckOdd = (
       )})$`;
       const betslipMatch = betslipBetDescription.match(betslipHandicapRegex);
       if (!betslipMatch) {
-        return error('В купоне неподходящая роспись');
+        return error('В купоне неподходящая роспись (Теннис F)');
       }
       if (/^F1$/i.test(odd)) {
         if (!ri`${betslipMatch[1]}`.test(teamNames.teamOne)) {
@@ -205,7 +205,7 @@ const getCheckOdd = (
       }
       const betslipMatch = betslipBetDescription.match(betslipTotalRegex);
       if (!betslipMatch) {
-        return error('В купоне неподходящая роспись');
+        return error('В купоне неподходящая роспись (Футбол OU)');
       }
       if (/^TO$/i.test(odd)) {
         if (!/^over$/i.test(betslipMatch[1])) {
@@ -227,7 +227,7 @@ const getCheckOdd = (
       })})(?: games in set ([1-5]))?$`;
       const betslipMatch = betslipBetDescription.match(betslipTotalRegEx);
       if (!betslipMatch) {
-        return error('В купоне неподходящая роспись');
+        return error('В купоне неподходящая роспись (Теннис OU)');
       }
       if (/^TO$/i.test(odd)) {
         if (!/^over$/i.test(betslipMatch[1])) {
@@ -253,7 +253,7 @@ const getCheckOdd = (
       )})$`;
       const betslipMatch = betslipBetDescription.match(betslipTeamTotalRegex);
       if (!betslipMatch) {
-        return error('В купоне неподходящая роспись');
+        return error('В купоне неподходящая роспись (Футбол OU[12])');
       }
       if (/^OU1$/i.test(market)) {
         if (!ri`${betslipMatch[1]}`.test(teamNames.teamOne)) {
@@ -283,7 +283,7 @@ const getCheckOdd = (
       )})$`;
       const betslipMatch = betslipBetDescription.match(betslipPlayerTotalRegEx);
       if (!betslipMatch) {
-        return error('В купоне неподходящая роспись');
+        return error('В купоне неподходящая роспись (Теннис OU[12])');
       }
       if (/^OU1$/i.test(market)) {
         if (!ri`${betslipMatch[1]}`.test(teamNames.teamOne)) {
@@ -337,7 +337,7 @@ const getCheckOdd = (
       )})$`;
       const betslipMatch = betslipBetDescription.match(betslipEHandicapRegex);
       if (!betslipMatch) {
-        return error('В купоне неподходящая роспись');
+        return error('В купоне неподходящая роспись (Футбол EH)');
       }
       if (/^EH1$/i.test(odd)) {
         if (!ri`${betslipMatch[1]}`.test(teamNames.teamOne)) {
@@ -361,7 +361,7 @@ const getCheckOdd = (
     const betslipBtsRegex = /^(Yes|No)$/i;
     const betslipMatch = betslipBetDescription.match(betslipBtsRegex);
     if (!betslipMatch) {
-      return error('В купоне неподходящая роспись');
+      return error('В купоне неподходящая роспись (BTS)');
     }
     if (/^Y$/i.test(odd)) {
       if (!/^Yes$/i.test(betslipMatch[1])) {
@@ -408,7 +408,7 @@ const getCheckOdd = (
         betslipCornersTotalHandicapRegex
       );
       if (!betslipMatch) {
-        return error('В купоне неподходящая роспись');
+        return error('В купоне неподходящая роспись (Футбол CNR_OU)');
       }
       if (odd === 'TO') {
         if (!/^over$/i.test(betslipMatch[1])) {

@@ -7,7 +7,7 @@ export const getTennisCompletedSetsCount = (): number => {
     ),
   ];
   return setScore.reduce(
-    (accumulator, cell) => accumulator + parseInt(cell.textContent, 10),
+    (accumulator, cell) => accumulator + Number(cell.textContent),
     0
   );
 };
@@ -16,7 +16,7 @@ const getTennisCompletedSetsGamesScores = (): Element[] => {
   const completedSetsCount = getTennisCompletedSetsCount();
   return [...document.querySelectorAll('.ipe-TennisGridColumn')].filter(
     (column) => {
-      return parseInt(column.firstChild.textContent, 10) <= completedSetsCount;
+      return Number(column.firstChild.textContent) <= completedSetsCount;
     }
   );
 };
@@ -32,7 +32,7 @@ export const getTennisCompletedSetsGamesCount = (): number => {
         ),
       ].reduce(
         (gameAccumulator, playerScore) =>
-          gameAccumulator + parseInt(playerScore.textContent, 10),
+          gameAccumulator + Number(playerScore.textContent),
         0
       ),
     0

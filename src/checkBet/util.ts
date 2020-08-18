@@ -39,15 +39,18 @@ export const getTennisCompletedSetsGamesCount = (): number => {
   );
 };
 
-export const getHandicapScoreOffset = (score: string): number => {
+export const getHandicapScoreOffset = (
+  score: string,
+  player: 1 | 2
+): number => {
   const match = score.match(/\((\d+)-(\d+)\)/);
   if (!match) {
     // log(`Не удалось распаристь счёт: "${score}"`, 'crimson');
     return null;
   }
-  const left = parseInt(match[1], 10);
-  const right = parseInt(match[2], 10);
-  return left - right;
+  const left = Number(match[1]);
+  const right = Number(match[2]);
+  return player === 1 ? right - left : left - right;
 };
 
 export const parseParameter = (parameter: string): number => {

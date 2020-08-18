@@ -132,14 +132,17 @@ const getCheckOdd = (
       } else {
         return error(`Необрабатываемый исход (${odd}). Напишите в ТП`);
       }
-      let handicapOffset = getHandicapScoreOffset(betslipMatch[1]);
+      const handicapPlayer = ri`${betslipMatch[2]}`.test(teamNames.teamOne)
+        ? 1
+        : 2;
+      const handicapOffset = getHandicapScoreOffset(
+        betslipMatch[1],
+        handicapPlayer
+      );
       if (handicapOffset === null) {
         return error(`Не удалось распаристь счёт - ${betslipMatch[1]}`);
       }
-      if (ri`${betslipMatch[2]}`.test(teamNames.teamTwo)) {
-        handicapOffset = -handicapOffset;
-      }
-      return success(handicapOffset + parseParameter(betslipMatch[3]));
+      return success(parseParameter(betslipMatch[3]) + handicapOffset);
     }
     if (worker.SportId === 2) {
       const betslipHandicapRegex = ri`^(${teamRegex})(?: \(Set ([1-5])\))? (${formatParameterRegex(

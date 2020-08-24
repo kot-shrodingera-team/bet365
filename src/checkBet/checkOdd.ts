@@ -157,7 +157,7 @@ const getCheckOdd = (
           return error('Открыта фора не на первого игрока');
         }
       } else if (/^F2$/i.test(odd)) {
-        if (!ri`${betslipMatch[2]}`.test(teamNames.teamTwo)) {
+        if (!ri`${betslipMatch[1]}`.test(teamNames.teamTwo)) {
           return error('Открыта фора не на второго игрока');
         }
       } else {
@@ -221,11 +221,11 @@ const getCheckOdd = (
       return success(parseParameter(betslipMatch[2]));
     }
     if (worker.SportId === 2) {
-      const betslipTotalRegEx = ri`^(Over|Under) (${formatParameterRegex({
+      const betslipTotalRegex = ri`^(Over|Under) (${formatParameterRegex({
         sign: false,
         double: false,
       })})(?: games in set ([1-5]))?$`;
-      const betslipMatch = betslipBetDescription.match(betslipTotalRegEx);
+      const betslipMatch = betslipBetDescription.match(betslipTotalRegex);
       if (!betslipMatch) {
         return error('В купоне неподходящая роспись (Теннис OU)');
       }
@@ -278,10 +278,10 @@ const getCheckOdd = (
       return success(parseParameter(betslipMatch[3]));
     }
     if (worker.SportId === 2) {
-      const betslipPlayerTotalRegEx = ri`^(${teamRegex}) (Over|Under) (${formatParameterRegex(
+      const betslipPlayerTotalRegex = ri`^(${teamRegex}) (Over|Under) (${formatParameterRegex(
         { sign: false, double: false }
       )})$`;
-      const betslipMatch = betslipBetDescription.match(betslipPlayerTotalRegEx);
+      const betslipMatch = betslipBetDescription.match(betslipPlayerTotalRegex);
       if (!betslipMatch) {
         return error('В купоне неподходящая роспись (Теннис OU[12])');
       }

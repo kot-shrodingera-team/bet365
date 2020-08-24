@@ -100,11 +100,12 @@ const showStake = async (): Promise<void> => {
     }
   }
 
-  const controlBar = await getElement('.ip-ControlBar_ButtonBar');
-  if (!controlBar) {
-    jsFail('Не найден Control Bar');
+  const betslipModule = await getElement('.bsl-BetslipLoaderModule');
+  if (!betslipModule) {
+    jsFail('Не загрузился модуль купона');
     return;
   }
+
   if (typeof ns_favouriteslib_ui === 'undefined') {
     jsFail('Страница не догрузилась');
     window.location.href = new URL('/#/IP/', worker.BookmakerMainUrl).href;

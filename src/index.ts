@@ -6,18 +6,9 @@ import doStake from './worker_callbacks/doStake';
 import checkCouponLoading from './worker_callbacks/checkCouponLoading';
 import checkStakeStatus from './worker_callbacks/checkStakeStatus';
 import afterSuccesfulStake from './worker_callbacks/afterSuccesfulStake';
-import showStake from './show_stake';
 import fastLoad from './fastLoad';
 import initialize from './initialization';
-
-(async (): Promise<void> => {
-  log(`Загрузка страницы`, 'steelblue');
-  if (!worker.IsShowStake) {
-    initialize();
-  } else {
-    showStake();
-  }
-})();
+import showStake from './show_stake';
 
 worker.SetCallBacks(
   log,
@@ -30,3 +21,12 @@ worker.SetCallBacks(
 );
 
 worker.SetFastCallback(fastLoad);
+
+(async (): Promise<void> => {
+  log(`Загрузка страницы`, 'steelblue');
+  if (!worker.IsShowStake) {
+    initialize();
+  } else {
+    showStake();
+  }
+})();

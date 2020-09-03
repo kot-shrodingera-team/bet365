@@ -59,25 +59,30 @@ export const accountBlocked = (): void => {
 };
 
 export const accountLimited = (): void => {
+  const message = (() => {
+    let text = 'В Bet365 порезанный аккаунт (отсутствует Cash Out)';
+    if (worker.PauseOnLimitedAccount) {
+      text += '. В настройках включена опция паузы при порезанном аккаунте';
+      if (worker.SetBookmakerPaused && worker.SetBookmakerPaused(true)) {
+        text += '. БК успешно поставлена на паузу';
+      } else {
+        text +=
+          '. Не удалось поставить БК на паузу. Поставьте на паузу вручную';
+      }
+    } else {
+      text +=
+        '. В настройках отключена опция паузы при порезанном аккаунте. БК продолжает работу';
+    }
+    return text;
+  })();
   if (
-    !worker.GetSessionData ||
+    worker.GetSessionData &&
     worker.GetSessionData('Bet365 LimitedAccountInformed') !== '1'
   ) {
-    const message = (() => {
-      let text = 'В Bet365 порезанный аккаунт (отсутствует Cash Out)';
-      if (worker.PauseOnLimitedAccount) {
-        if (worker.SetBookmakerPaused && worker.SetBookmakerPaused(true)) {
-          text += '. Bet365 поставлен на паузу';
-        } else {
-          text += '. Bet365 НЕ поставлен на паузу. Поставьте на паузу вручную';
-        }
-      }
-      return text;
-    })();
-    if (worker.GetSessionData) {
-      worker.SetSessionData('Bet365 LimitedAccountInformed', '1');
-    }
-    log(message, 'crimson');
     worker.Helper.SendInformedMessage(message);
+    worker.SetSessionData('Bet365 LimitedAccountInformed', '1');
+    log(message, 'crimson');
+  } else {
+    log(message, 'orange');
   }
 };

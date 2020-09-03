@@ -38,7 +38,7 @@ const showStake = async (): Promise<void> => {
         : 'Аккаунт Bet365 заблокирован! Bet365 НЕ поставлен на паузу. Поставьте на паузу вручную';
     log(message, 'red');
     worker.Helper.SendInformedMessage(message);
-    worker.JSFail();
+    jsFail();
     return;
   }
 
@@ -123,7 +123,7 @@ const showStake = async (): Promise<void> => {
 
   const couponCleared = await clearCoupon();
   if (!couponCleared) {
-    worker.JSFail();
+    jsFail();
     return;
   }
 

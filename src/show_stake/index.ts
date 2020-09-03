@@ -9,8 +9,7 @@ import getStakeCount from '../stake_info/getStakeCount';
 import getCurrentEventName from '../checkBet/getCurrentEventName';
 import changeToStandardBetslip from './changeToStandardBetslip';
 import checkBet from '../checkBet';
-import checkAuth from '../stake_info/checkAuth';
-import authCheckReady from '../initialization/authCheckReady';
+import checkAuth, { authCheckReady } from '../stake_info/checkAuth';
 import clearCoupon from './clearCoupon';
 import checkCurrentLanguage from '../initialization/checkCurrentLanguage';
 

@@ -1,7 +1,14 @@
-import checkAuthGenerator from '@kot-shrodingera-team/germes-generators/stake_info/checkAuth';
+import checkAuthGenerator, {
+  authStateReadyGenerator,
+} from '@kot-shrodingera-team/germes-generators/stake_info/checkAuth';
+
+export const authCheckReady = authStateReadyGenerator({
+  noAuthElementSelector: '.hm-MainHeaderRHSLoggedOutWide_Login',
+  authElementSelector: '.hm-MainHeaderMembersWide',
+});
 
 const checkAuth = checkAuthGenerator({
-  accountSelector: '.hm-MainHeaderMembersWide',
+  authElementSelector: '.hm-MainHeaderMembersWide',
 });
 
 export default checkAuth;

@@ -9,7 +9,7 @@ import getStakeCount from '../stake_info/getStakeCount';
 import getCurrentEventName from '../checkBet/getCurrentEventName';
 import changeToStandardBetslip from './changeToStandardBetslip';
 import checkBet from '../checkBet';
-import checkAuth, { authCheckReady } from '../stake_info/checkAuth';
+import checkAuth, { authStateReady } from '../stake_info/checkAuth';
 import clearCoupon from './clearCoupon';
 import checkCurrentLanguage from '../initialization/checkCurrentLanguage';
 
@@ -73,7 +73,7 @@ const showStake = async (): Promise<void> => {
     freeBetMessageClose.click();
   }
 
-  await authCheckReady();
+  await authStateReady();
   worker.Islogin = checkAuth();
   worker.JSLogined();
   if (!worker.Islogin) {

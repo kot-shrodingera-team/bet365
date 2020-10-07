@@ -90,6 +90,42 @@ const checkStakeStatus = (): boolean => {
     }
     return false;
   }
+  const footerMessageElement = document.querySelector(
+    '.bss-Footer_MessageBody'
+  );
+  if (footerMessageElement) {
+    const footerMessage = footerMessageElement.textContent.trim();
+    if (
+      /In accordance with licensing conditions we are required to verify your age and identity. Certain restrictions may be applied to your account until we are able to verify your details. Please go to the Know Your Customer page in Members and provide the requested information./i.test(
+        footerMessage
+      )
+    ) {
+      log('Ставка не принята (ошибка, не пройден Step 2)', 'orange');
+      const paused = worker.SetBookmakerPaused(true);
+      const message = `В Bet365 ограничение аккаунта (не пройден Step 2). ${
+        paused
+          ? 'БК поставлена на паузу'
+          : 'Не удалось поставить БК на паузу, поставьте самостоятельно'
+      }`;
+      worker.Helper.SendInformedMessage(message);
+      return false;
+    }
+    if (
+      /As part of the ongoing management of your account we need you to answer a set of questions relating to Responsible Gambling. Certain restrictions may be applied to your account until you have successfully completed this. You can answer these questions now by going to the Self-Assessment page in Members./i.test(
+        footerMessage
+      )
+    ) {
+      log('Ставка не принята (ошибка, не пройден опрос)', 'orange');
+      const paused = worker.SetBookmakerPaused(true);
+      const message = `В Bet365 ограничение аккаунта (не пройден опрос). ${
+        paused
+          ? 'БК поставлена на паузу'
+          : 'Не удалось поставить БК на паузу, поставьте самостоятельно'
+      }`;
+      worker.Helper.SendInformedMessage(message);
+      return false;
+    }
+  }
   log('Ставка не принята (текст ошибки не найден)', 'tomato');
   return false;
 };

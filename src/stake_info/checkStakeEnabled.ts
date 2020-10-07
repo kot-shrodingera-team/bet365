@@ -11,6 +11,28 @@ const preCheck = (): boolean => {
     accountBlocked();
     return false;
   }
+  const footerMessageElement = document.querySelector(
+    '.bss-Footer_MessageBody'
+  );
+  if (footerMessageElement) {
+    const footerMessage = footerMessageElement.textContent.trim();
+    if (
+      /In accordance with licensing conditions we are required to verify your age and identity. Certain restrictions may be applied to your account until we are able to verify your details. Please go to the Know Your Customer page in Members and provide the requested information./i.test(
+        footerMessage
+      )
+    ) {
+      log('Ставка недоступна (ошибка, не пройден Step 2)', 'crimson');
+      return false;
+    }
+    if (
+      /As part of the ongoing management of your account we need you to answer a set of questions relating to Responsible Gambling. Certain restrictions may be applied to your account until you have successfully completed this. You can answer these questions now by going to the Self-Assessment page in Members./i.test(
+        footerMessage
+      )
+    ) {
+      log('Ставка недоступна (ошибка, не пройден опрос)', 'crimson');
+      return false;
+    }
+  }
   const betslipModule = document.querySelector('.bsm-BetslipStandardModule');
   if (
     betslipModule &&

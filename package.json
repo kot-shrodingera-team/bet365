@@ -7,7 +7,7 @@
     "@kot-shrodingera-team/rollup-config-germes": "^1.0.4",
     "@kot-shrodingera-team/typescript-config-germes": "^1.0.3",
     "@kot-shrodingera-team/worker-declaration": "^1.0.5",
-    "@kot-shrodingera-team/germes-generators": "^1.0.59",
+    "@kot-shrodingera-team/germes-generators": "^1.0.65",
     "@kot-shrodingera-team/germes-utils": "^1.0.12",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-typescript": "^6.0.0",

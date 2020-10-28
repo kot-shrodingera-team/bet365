@@ -2,6 +2,9 @@ import setStakeSumGenerator from '@kot-shrodingera-team/germes-generators/worker
 
 const setStakeSum = setStakeSumGenerator({
   sumInputSelector: 'input.bss-StakeBox_StakeValueInput',
+  alreadySetCheck: {
+    falseOnSumChange: true,
+  },
 });
 
 export default setStakeSum;

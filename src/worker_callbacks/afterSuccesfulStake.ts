@@ -1,4 +1,5 @@
-import { log } from '@kot-shrodingera-team/germes-utils';
+import { log, toFormData } from '@kot-shrodingera-team/germes-utils';
+import { getConfig } from '../config';
 
 const afterSuccesfulStake = (): void => {
   const lastStakeCoefficient = document.querySelector('.bs-OddsLabel');
@@ -27,6 +28,26 @@ const afterSuccesfulStake = (): void => {
     return;
   }
   log('Коеффициент не изменился', 'lightblue');
+  if (getConfig().includes('send_bet_id')) {
+    const betReferenceElement = document.querySelector(
+      '.bs-ReceiptContent_BetRef'
+    );
+    if (!betReferenceElement) {
+      log('Не найден Bet Reference', 'crimson');
+      return;
+    }
+    const bodyData = toFormData({
+      bot_api: worker.ApiKey,
+      fork_id: worker.ForkId,
+      bet365_bet_id: betReferenceElement.textContent
+        .replace('Bet Ref', '')
+        .trim(),
+    });
+    fetch('https://strike.ws/bet_365_bet_ids_to_our_server.php', {
+      method: 'POST',
+      body: bodyData,
+    });
+  }
 };
 
 export default afterSuccesfulStake;

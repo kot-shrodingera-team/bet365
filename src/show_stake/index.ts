@@ -1,4 +1,9 @@
-import { log, awaiter, getElement } from '@kot-shrodingera-team/germes-utils';
+import {
+  log,
+  awaiter,
+  getElement,
+  toFormData,
+} from '@kot-shrodingera-team/germes-utils';
 import WorkerBetObject from '@kot-shrodingera-team/worker-declaration/workerBetObject';
 import { updateBalance, balanceReady } from '../stake_info/getBalance';
 import {
@@ -12,6 +17,7 @@ import checkBet from '../checkBet';
 import checkAuth, { authStateReady } from '../stake_info/checkAuth';
 import clearCoupon from './clearCoupon';
 import checkCurrentLanguage from '../initialization/checkCurrentLanguage';
+import { setConfig } from '../config';
 
 let couponOpenning = false;
 
@@ -120,19 +126,67 @@ const showStake = async (): Promise<void> => {
   //   closeBetslipButton.click();
   // }
 
-  const couponCleared = await clearCoupon();
-  if (!couponCleared) {
-    jsFail();
-    return;
-  }
-
   const rawBetData = worker.BetId.split('_');
   if (rawBetData.length < 5) {
     jsFail('Некорректный формат данных о ставке. Сообщите в ТП');
     return;
   }
   const betData = rawBetData.slice(0, 4).concat(rawBetData.slice(4).join('_'));
-  const [betId, fi, od, zw /* , betName */] = betData;
+  const [betId, fi, od, zw, config] = betData;
+  setConfig(config);
+
+  const couponCleared = await clearCoupon();
+  if (!couponCleared) {
+    jsFail();
+    return;
+  }
+
+  const prematchOnly = config.includes('prematch_only');
+  const sendLiveMatchTime = config.includes('send_live_match_time');
+  if (prematchOnly || sendLiveMatchTime) {
+    log('Определяем время матча');
+    log('Возвращаемся на In-Play', 'orange');
+    window.location.href = new URL('/#/IP', window.location.origin).href;
+    const clockDissapeared = await awaiter(
+      () => !document.querySelector('.ipe-EventHeader_ClockContainer')
+    );
+    if (!clockDissapeared) {
+      jsFail('Время матча не исчезло');
+      return;
+    }
+    log('Время матча исчезло. Переходим на страницу события', 'orange');
+    const [eventIdUrl] = worker.EventUrl.split('/').slice(-1);
+    window.location.href = new URL(
+      `/#/IP/${eventIdUrl}`,
+      window.location.origin
+    ).href;
+    const clockElement = await getElement('.ipe-EventHeader_ClockContainer');
+    if (!clockElement) {
+      jsFail('Не найдено время матча');
+      return;
+    }
+    const matchTime = clockElement.textContent.trim();
+    log(`Время матча: ${matchTime}`);
+    if (matchTime !== '00:00') {
+      if (sendLiveMatchTime) {
+        log('Отправляем время матча', 'orange');
+        const bodyData = toFormData({
+          bot_api: worker.ApiKey,
+          fork_id: worker.ForkId,
+          event_id: worker.EventId,
+          match_time: matchTime,
+        });
+        fetch('https://strike.ws/bet_365_event_duration.php', {
+          method: 'POST',
+          body: bodyData,
+        });
+      }
+      if (prematchOnly) {
+        jsFail('Матч уже начался');
+        return;
+      }
+    }
+  }
 
   const ConstructString = `pt=N#o=${od}#f=${fi}#fp=${betId}#so=#c=1#mt=1#id=${zw}Y#|TP=BS${zw}#`;
   const Uid = '';

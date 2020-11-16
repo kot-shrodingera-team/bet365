@@ -141,6 +141,14 @@ const showStake = async (): Promise<void> => {
     return;
   }
 
+  const remainLoggedInButton = document.querySelector(
+    '.alm-ActivityLimitAlert_Button'
+  ) as HTMLElement;
+  if (remainLoggedInButton) {
+    log('Нажимаем кнопку "Remain Logged In"', 'orange');
+    remainLoggedInButton.click();
+  }
+
   const prematchOnly = config.includes('prematch_only');
   const sendLiveMatchTime = config.includes('send_live_match_time');
   if (prematchOnly || sendLiveMatchTime) {

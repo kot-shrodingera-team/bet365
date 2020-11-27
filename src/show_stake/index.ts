@@ -3,6 +3,7 @@ import {
   awaiter,
   getElement,
   toFormData,
+  sleep,
 } from '@kot-shrodingera-team/germes-utils';
 import WorkerBetObject from '@kot-shrodingera-team/worker-declaration/workerBetObject';
 import { updateBalance, balanceReady } from '../stake_info/getBalance';
@@ -269,6 +270,13 @@ const showStake = async (): Promise<void> => {
   if (!checkBet(true).correctness) {
     jsFail('Ставка не соответствует росписи');
     return;
+  }
+  const couponOpenDelayRegex = /coupon_open_delay=(\d+(?:\/\d+)?)/i;
+  const couponOpenDelayMatch = config.match(couponOpenDelayRegex);
+  if (couponOpenDelayMatch) {
+    const delay = Number(couponOpenDelayMatch[1]);
+    log(`Задержка ${delay} секунд после открытия купона`, 'orange');
+    await sleep(delay * 1000);
   }
   log('Ставка успешно открыта', 'green');
   couponOpenning = false;

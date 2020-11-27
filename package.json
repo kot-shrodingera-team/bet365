@@ -1,6 +1,6 @@
 {
   "name": "@kot-shrodingera-team/bet365",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "devDependencies": {
     "@kot-shrodingera-team/eslint-config-germes": "^1.0.4",
     "@kot-shrodingera-team/prettier-config-germes": "^1.0.1",

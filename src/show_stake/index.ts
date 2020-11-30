@@ -19,6 +19,7 @@ import checkAuth, { authStateReady } from '../stake_info/checkAuth';
 import clearCoupon from './clearCoupon';
 import checkCurrentLanguage from '../initialization/checkCurrentLanguage';
 import { setConfig } from '../config';
+import findEventInOverview from './findEventInOverview';
 
 let couponOpenning = false;
 
@@ -153,28 +154,30 @@ const showStake = async (): Promise<void> => {
   const prematchOnly = config.includes('prematch_only');
   const sendLiveMatchTime = config.includes('send_live_match_time');
   if (prematchOnly || sendLiveMatchTime) {
-    log('Определяем время матча');
-    log('Возвращаемся на In-Play', 'orange');
-    window.location.href = new URL('/#/IP', window.location.origin).href;
-    const clockDissapeared = await awaiter(
-      () => !document.querySelector('.ipe-EventHeader_ClockContainer')
-    );
-    if (!clockDissapeared) {
-      jsFail('Время матча не исчезло');
+    if (window.location.hash === '#/IP/B1') {
+      log('Открываем Overview футбола', 'orange');
+      const footballIconSelected = await getElement(
+        '.ovm-ClassificationBarButton-1.ovm-ClassificationBarButton-active'
+      );
+      if (!footballIconSelected) {
+        jsFail('Иконка футбола не выбрана');
+        return;
+      }
+    }
+    log('Открыт Overview футбола', 'orange');
+    await getElement('.ovm-Fixture');
+    const targetMatch = await findEventInOverview();
+    if (!targetMatch) {
+      jsFail('Событие не найдено');
       return;
     }
-    log('Время матча исчезло. Переходим на страницу события', 'orange');
-    const [eventIdUrl] = worker.EventUrl.split('/').slice(-1);
-    window.location.href = new URL(
-      `/#/IP/${eventIdUrl}`,
-      window.location.origin
-    ).href;
-    const clockElement = await getElement('.ipe-EventHeader_ClockContainer');
-    if (!clockElement) {
+    log('Определяем время матча');
+    const timerElement = targetMatch.querySelector('.ovm-InPlayTimer');
+    if (!timerElement) {
       jsFail('Не найдено время матча');
       return;
     }
-    const matchTime = clockElement.textContent.trim();
+    const matchTime = timerElement.textContent.trim();
     log(`Время матча: ${matchTime}`);
     if (matchTime !== '00:00') {
       if (sendLiveMatchTime) {

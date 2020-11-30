@@ -274,7 +274,7 @@ const showStake = async (): Promise<void> => {
     jsFail('Ставка не соответствует росписи');
     return;
   }
-  const couponOpenDelayRegex = /coupon_open_delay=(\d+(?:\/\d+)?)/i;
+  const couponOpenDelayRegex = /coupon_open_delay=(\d+(?:\.\d+)?)/i;
   const couponOpenDelayMatch = config.match(couponOpenDelayRegex);
   if (couponOpenDelayMatch) {
     const delay = Number(couponOpenDelayMatch[1]);

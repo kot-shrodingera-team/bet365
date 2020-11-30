@@ -164,14 +164,13 @@ const showStake = async (): Promise<void> => {
         return;
       }
     }
-    log('Открыт Overview футбола', 'orange');
     await getElement('.ovm-Fixture');
     const targetMatch = await findEventInOverview();
     if (!targetMatch) {
       jsFail('Событие не найдено');
       return;
     }
-    log('Определяем время матча');
+    log('Определяем время матча', 'steelblue');
     const timerElement = targetMatch.querySelector('.ovm-InPlayTimer');
     if (!timerElement) {
       jsFail('Не найдено время матча');

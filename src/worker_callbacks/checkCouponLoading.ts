@@ -18,6 +18,7 @@ const check = (): boolean => {
     accountBlocked();
     return false;
   }
+  const processingButton = document.querySelector('.bss-ProcessingButton');
   const betslipPlaceBetErrorMessageElement = document.querySelector(
     '.bs-PlaceBetErrorMessage_Contents'
   );
@@ -91,7 +92,11 @@ const check = (): boolean => {
       return false;
     }
   }
-  log(`Обработка ставки`, 'tan');
+  if (processingButton) {
+    log('Обработка ставки (индикатор)', 'tan');
+  } else {
+    log('Обработка ставки (нет индикатора)', 'tan');
+  }
   return true;
 };
 

@@ -30,7 +30,7 @@ const afterSuccesfulStake = (): void => {
   log('Коеффициент не изменился', 'lightblue');
   if (getConfig().includes('send_bet_id')) {
     const betReferenceElement = document.querySelector(
-      '.bs-ReceiptContent_BetRef'
+      '.bss-ReceiptContent_BetRef'
     );
     if (!betReferenceElement) {
       log('Не найден Bet Reference', 'crimson');

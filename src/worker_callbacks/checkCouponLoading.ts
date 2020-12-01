@@ -1,5 +1,6 @@
 import checkCouponLoadingGenerator from '@kot-shrodingera-team/germes-generators/worker_callbacks/checkCouponLoading';
 import { log } from '@kot-shrodingera-team/germes-utils';
+import { getConfig } from '../config';
 import {
   checkRestriction,
   accountBlocked,
@@ -91,6 +92,13 @@ const check = (): boolean => {
       log('Обработка ставки завершена (ошибка, не пройден опрос)', 'orange');
       return false;
     }
+  }
+  if (
+    getConfig().includes('placing_indicator_strict_check') &&
+    !processingButton
+  ) {
+    log('Обработка ставки завершена (нет индикатора)', 'orange');
+    return false;
   }
   if (processingButton) {
     log('Обработка ставки (индикатор)', 'tan');

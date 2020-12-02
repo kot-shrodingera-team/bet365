@@ -93,10 +93,21 @@ const check = (): boolean => {
       return false;
     }
   }
-  if (
-    getConfig().includes('placing_indicator_strict_check') &&
-    !processingButton
-  ) {
+  const placingIndicatorStrictCheckRegex = /placing_indicator_strict_check=(\d+(?:\.\d+)?)/i;
+  const placingIndicatorStrictCheckMatch = getConfig().match(
+    placingIndicatorStrictCheckRegex
+  );
+  if (placingIndicatorStrictCheckMatch) {
+    const placingIndicatorStrictCheckDelay =
+      1000 * Number(placingIndicatorStrictCheckMatch[1]);
+    if (timePassedSinceDoStake <= placingIndicatorStrictCheckDelay) {
+      log('Обработка ставки (задержка)', 'tan');
+      return true;
+    }
+    if (processingButton) {
+      log('Обработка ставки (индикатор)', 'tan');
+      return true;
+    }
     log('Обработка ставки завершена (нет индикатора)', 'orange');
     return false;
   }

@@ -16,6 +16,13 @@ const changeToStandardBetslip = async (): Promise<boolean> => {
   }
   fireEvent(qbsAddToBetslipButton, 'touchstart', TouchEvent);
   fireEvent(qbsAddToBetslipButton, 'touchend', TouchEvent);
+  const normalBetItem = await getElement(
+    '.bss-NormalBetItem_FixtureDescription'
+  );
+  if (!normalBetItem) {
+    log('Стандартный купон не появился', 'crimson');
+    return false;
+  }
   return true;
 };
 

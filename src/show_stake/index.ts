@@ -235,11 +235,11 @@ const showStake = async (): Promise<void> => {
   const qbsStakeInput = document.querySelector('.qbs-StakeBox_StakeInput');
   if (qbsStakeInput) {
     log('Мобильный купон. Переключаем на стандартный', 'orange');
-    if (!changeToStandardBetslip()) {
+    const changed = await changeToStandardBetslip();
+    if (!changed) {
       jsFail('Не удалось переключится на стандартный купон');
       return;
     }
-    await getElement('.bss-NormalBetItem_FixtureDescription');
   }
   if (getCurrentEventName() === null) {
     jsFail('Название события так и не повилось в купоне');

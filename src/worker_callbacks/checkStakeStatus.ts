@@ -1,7 +1,25 @@
 import { log, stakeInfoString } from '@kot-shrodingera-team/germes-utils';
 import { updateBalance } from '../stake_info/getBalance';
+import { getReferBetConfirmation } from './checkCouponLoading';
 
 const checkStakeStatus = (): boolean => {
+  if (getReferBetConfirmation()) {
+    const betslip = document.querySelector('.bss-StandardBetslip');
+    if (betslip) {
+      // eslint-disable-next-line no-console
+      console.log(betslip.innerHTML);
+    }
+    const referBetDeclined = document.querySelector(
+      '.bss-ReferralInfo_Label-partialdecline'
+    );
+    if (referBetDeclined) {
+      log('Refer Bet Declined', 'steelblue');
+      worker.Helper.SendInformedMessage('Refer Bet Declined');
+    } else {
+      log('[Скорее всего] Refer Bet Accepted', 'steelblue');
+      worker.Helper.SendInformedMessage('[Скорее всего] Refer Bet Accepted');
+    }
+  }
   const acceptButton = document.querySelector(
     '.bs-AcceptButton'
   ) as HTMLElement;

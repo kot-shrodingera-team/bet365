@@ -1,5 +1,5 @@
 import checkCouponLoadingGenerator from '@kot-shrodingera-team/germes-generators/worker_callbacks/checkCouponLoading';
-import { log } from '@kot-shrodingera-team/germes-utils';
+import { log, stakeInfoString } from '@kot-shrodingera-team/germes-utils';
 import { getConfig } from '../config';
 import {
   checkRestriction,
@@ -14,12 +14,71 @@ export const setIsNewMax = (newMax: boolean): void => {
   isNewMax = newMax;
 };
 
+let referBetConfirmation = false;
+
+export const resetReferBetConfirmation = (): void => {
+  referBetConfirmation = false;
+};
+
+export const getReferBetConfirmation = (): boolean => {
+  return referBetConfirmation;
+};
+
 const check = (): boolean => {
   if (checkRestriction()) {
     accountBlocked();
     return false;
   }
   const processingButton = document.querySelector('.bss-ProcessingButton');
+  const referBetConfirmationElement = document.querySelector(
+    '.bss-ReferBetConfirmation'
+  );
+  if (referBetConfirmationElement) {
+    if (processingButton) {
+      log('Обработка ставки (Refer Bet Confirmation индикатор)', 'tan');
+      return true;
+    }
+    log('Refer Bet Confirmation', 'steelblue');
+    const placeNowValueElement = document.querySelector(
+      '.bss-ReferBetConfirmation_PlaceNow .bss-ReferBetConfirmation_Referred-value'
+    );
+    const referredValueElement = document.querySelector(
+      '.bss-ReferBetConfirmation_Referred .bss-ReferBetConfirmation_Referred-value'
+    );
+    const placeBetAndReferButton = document.querySelector(
+      '.bss-PlaceBetReferButton_Text'
+    ) as HTMLElement;
+    if (
+      placeNowValueElement &&
+      referredValueElement &&
+      placeBetAndReferButton
+    ) {
+      const valueRegex = /(\d+(?:\.\d+)?)/;
+      const placeNowValueText = placeNowValueElement.textContent.trim();
+      const placeNowValueMatch = placeNowValueText.match(valueRegex);
+      const referredValueText = referredValueElement.textContent.trim();
+      const referredValueMatch = referredValueText.match(valueRegex);
+      const placeNowValue = placeNowValueMatch[1];
+      const referredValue = referredValueMatch[1];
+
+      const message =
+        `Bet365: Refer Bet Confirmation\n` +
+        `${stakeInfoString()}\n` +
+        `Place Now Value: ${placeNowValue}\n` +
+        `Referred Value: ${referredValue}`;
+      log(message, 'steelblue');
+      worker.Helper.SendInformedMessage(message);
+      placeBetAndReferButton.click();
+      log('Нажимаем на кнопку "Place Bet and Refer"', 'orange');
+      referBetConfirmation = true;
+      return true;
+    }
+    if (processingButton) {
+      log('Обработка ставки (Refer Bet Confirmation индикатор)', 'tan');
+      return true;
+    }
+    log('Refer Bet Confirmation без индикатора', 'tan');
+  }
   const betslipPlaceBetErrorMessageElement = document.querySelector(
     '.bs-PlaceBetErrorMessage_Contents'
   );

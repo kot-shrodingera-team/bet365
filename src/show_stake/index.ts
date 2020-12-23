@@ -91,10 +91,11 @@ const showStake = async (): Promise<void> => {
   await balanceReady();
   updateBalance();
 
-  if (!checkCurrentLanguage()) {
+  if (!(await checkCurrentLanguage())) {
     jsFail();
     return;
   }
+  log('Проверка языка прошла', 'steelblue');
 
   const cashOutEnabled = await checkCashOutEnabled();
   if (cashOutEnabled === 0) {

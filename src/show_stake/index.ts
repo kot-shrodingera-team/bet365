@@ -172,6 +172,13 @@ const showStake = async (): Promise<void> => {
       return;
     }
     log('Определяем время матча', 'steelblue');
+    await awaiter(() => {
+      const timerElement = targetMatch.querySelector('.ovm-InPlayTimer');
+      if (!timerElement) {
+        return false;
+      }
+      return timerElement.textContent.trim();
+    });
     const timerElement = targetMatch.querySelector('.ovm-InPlayTimer');
     if (!timerElement) {
       jsFail('Не найдено время матча');

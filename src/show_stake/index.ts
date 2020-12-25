@@ -49,6 +49,24 @@ const showStake = async (): Promise<void> => {
     return;
   }
 
+  const rawBetData = worker.BetId.split('_');
+  if (rawBetData.length < 5) {
+    jsFail('Некорректный формат данных о ставке. Сообщите в ТП');
+    return;
+  }
+  const betData = rawBetData.slice(0, 4).concat(rawBetData.slice(4).join('_'));
+  const [betId, fi, od, zw, config] = betData;
+  setConfig(config);
+
+  if (config.includes('reload_before_show_stake')) {
+    if (localStorage.getItem('reloadedBeforeShowStake') === '0') {
+      log('Перезагружаем страницу перед открытием ставки', 'orange');
+      localStorage.setItem('reloadedBeforeShowStake', '1');
+      window.location.reload();
+      return;
+    }
+  }
+
   const locatorLoaded = await awaiter(
     () => typeof Locator !== 'undefined',
     10000
@@ -128,15 +146,6 @@ const showStake = async (): Promise<void> => {
   //   log('Закрываем купон', 'orange);
   //   closeBetslipButton.click();
   // }
-
-  const rawBetData = worker.BetId.split('_');
-  if (rawBetData.length < 5) {
-    jsFail('Некорректный формат данных о ставке. Сообщите в ТП');
-    return;
-  }
-  const betData = rawBetData.slice(0, 4).concat(rawBetData.slice(4).join('_'));
-  const [betId, fi, od, zw, config] = betData;
-  setConfig(config);
 
   const couponCleared = await clearCoupon();
   if (!couponCleared) {

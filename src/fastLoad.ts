@@ -6,6 +6,7 @@ import showStake from './show_stake';
 const fastLoad = async (): Promise<void> => {
   clearMaximumStake();
   log(`Быстрая загрузка (${version})`, 'steelblue');
+  localStorage.setItem('reloadedBeforeShowStake', '0');
 
   if (!checkUrl()) {
     log('Открыт другой сайт. Возвращаемся на Bet365', 'steelblue');

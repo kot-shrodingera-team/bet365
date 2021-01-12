@@ -2,9 +2,9 @@ import { getElement, log, awaiter } from '@kot-shrodingera-team/germes-utils';
 import getStakeCount from '../stake_info/getStakeCount';
 
 const changeToStandardBetslip = async (): Promise<boolean> => {
-  const anyBet = document.querySelector(
+  const anyBet = (await getElement(
     '.ovm-ParticipantOddsOnly:not(.ovm-ParticipantOddsOnly_Highlighted)'
-  ) as HTMLElement;
+  )) as HTMLElement;
   if (!anyBet) {
     log('Не найдена любая ставка', 'crimson', true);
     return false;

@@ -1,43 +1,43 @@
 import { ri } from '@kot-shrodingera-team/germes-utils';
 
-export const getTennisCompletedSetsCount = (): number => {
-  const setScore = [
-    ...document.querySelectorAll(
-      '.ipe-TennisHeaderLayout_ColumnSets > .ipe-TennisGridColumn_Cell:not(:first-child)'
-    ),
-  ];
-  return setScore.reduce(
-    (accumulator, cell) => accumulator + Number(cell.textContent),
-    0
-  );
-};
+// export const getTennisCompletedSetsCount = (): number => {
+//   const setScore = [
+//     ...document.querySelectorAll(
+//       '.ipe-TennisHeaderLayout_ColumnSets > .ipe-TennisGridColumn_Cell:not(:first-child)'
+//     ),
+//   ];
+//   return setScore.reduce(
+//     (accumulator, cell) => accumulator + Number(cell.textContent),
+//     0
+//   );
+// };
 
-const getTennisCompletedSetsGamesScores = (): Element[] => {
-  const completedSetsCount = getTennisCompletedSetsCount();
-  return [...document.querySelectorAll('.ipe-TennisGridColumn')].filter(
-    (column) => {
-      return Number(column.firstChild.textContent) <= completedSetsCount;
-    }
-  );
-};
+// const getTennisCompletedSetsGamesScores = (): Element[] => {
+//   const completedSetsCount = getTennisCompletedSetsCount();
+//   return [...document.querySelectorAll('.ipe-TennisGridColumn')].filter(
+//     (column) => {
+//       return Number(column.firstChild.textContent) <= completedSetsCount;
+//     }
+//   );
+// };
 
-export const getTennisCompletedSetsGamesCount = (): number => {
-  const comletedSetsGamesScores = getTennisCompletedSetsGamesScores();
-  return comletedSetsGamesScores.reduce(
-    (gamesAccumulator, setRow) =>
-      gamesAccumulator +
-      [
-        ...setRow.querySelectorAll(
-          '.ipe-TennisGridColumn_Cell:not(:first-child)'
-        ),
-      ].reduce(
-        (gameAccumulator, playerScore) =>
-          gameAccumulator + Number(playerScore.textContent),
-        0
-      ),
-    0
-  );
-};
+// export const getTennisCompletedSetsGamesCount = (): number => {
+//   const comletedSetsGamesScores = getTennisCompletedSetsGamesScores();
+//   return comletedSetsGamesScores.reduce(
+//     (gamesAccumulator, setRow) =>
+//       gamesAccumulator +
+//       [
+//         ...setRow.querySelectorAll(
+//           '.ipe-TennisGridColumn_Cell:not(:first-child)'
+//         ),
+//       ].reduce(
+//         (gameAccumulator, playerScore) =>
+//           gameAccumulator + Number(playerScore.textContent),
+//         0
+//       ),
+//     0
+//   );
+// };
 
 export const getHandicapScoreOffset = (
   score: string,

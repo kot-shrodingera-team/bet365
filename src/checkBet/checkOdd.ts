@@ -4,8 +4,8 @@ import {
   formatParameterRegex,
   getHandicapScoreOffset,
   parseParameter,
-  getTennisCompletedSetsCount,
-  getTennisCompletedSetsGamesCount,
+  // getTennisCompletedSetsCount,
+  // getTennisCompletedSetsGamesCount,
 } from './util';
 import getSiteTeamNames from './getSiteTeamNames';
 
@@ -79,16 +79,16 @@ const getCheckOdd = (
         if (period !== Number(betslipMatch[2])) {
           return error(`Открыта не победа в ${period} сете`);
         }
-      } else if (period !== 0 && subperiod !== 0) {
-        const completedSetsCount = getTennisCompletedSetsCount();
-        if (period !== completedSetsCount + 1) {
-          return error('В росписи не текущий сет');
-        }
-        const completedSetsGamesCount = getTennisCompletedSetsGamesCount();
-        const resultGamesCount = completedSetsGamesCount + Number(subperiod);
-        if (resultGamesCount !== Number(betslipMatch[2])) {
-          return error(`Открыта не победа в ${resultGamesCount} гейме`);
-        }
+        // } else if (period !== 0 && subperiod !== 0) {
+        //   const completedSetsCount = getTennisCompletedSetsCount();
+        //   if (period !== completedSetsCount + 1) {
+        //     return error('В росписи не текущий сет');
+        //   }
+        //   const completedSetsGamesCount = getTennisCompletedSetsGamesCount();
+        //   const resultGamesCount = completedSetsGamesCount + Number(subperiod);
+        //   if (resultGamesCount !== Number(betslipMatch[2])) {
+        //     return error(`Открыта не победа в ${resultGamesCount} гейме`);
+        //   }
       }
       return success(-6666);
     }

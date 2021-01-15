@@ -24,6 +24,11 @@ interface Locator {
     getBetCount: () => number;
     deleteAllBets: () => void;
     addBet: (data: Bet365AddBetData) => void;
+    betslip: {
+      activeModule: {
+        quickBetslipMoveToStandard: () => void;
+      };
+    };
   };
 }
 

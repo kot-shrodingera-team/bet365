@@ -1,18 +1,9 @@
-/* eslint-disable no-underscore-dangle */
-window._xx = {
-  onDisconnect: {
-    addListener: (ls) => {
-      setTimeout(() => {
+window.chrome.runtime = {
+  connect: () => ({
+    onDisconnect: {
+      addListener: (ls: () => void) => {
         ls();
-      }, 1);
+      },
     },
-  },
-};
-
-window.chrome = {
-  runtime: {
-    connect: () => {
-      return window._xx;
-    },
-  },
+  }),
 };

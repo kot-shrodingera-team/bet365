@@ -17,7 +17,7 @@ export const updateMaximumStake = (): boolean => {
   if (betErrorMessageElement) {
     const betErrorMessage = betErrorMessageElement.textContent.trim();
     const maxErrorMatch = betErrorMessage.match(
-      /^Stake\/risk entered on selection .* is above the available maximum of .*(\d+\.\d+)\.$/i
+      /^Stake\/risk entered on selection .* is above the available maximum of .*?(\d+\.\d+)\.$/i
     );
     if (maxErrorMatch) {
       log(`Обновлена максимальная ставка: "${maxErrorMatch[1]}"`, 'orange');
@@ -38,7 +38,7 @@ export const updateMaximumStake = (): boolean => {
       }
       const newMaxStakeValueText = newMaxStakeValueElement.textContent.trim();
       const newMaxErrorMatch = newMaxStakeValueText.match(
-        /^Max Stake .*(\d+\.\d+)\.$/i
+        /^Max Stake .*?(\d+\.\d+)$/i
       );
       if (!newMaxErrorMatch) {
         log(

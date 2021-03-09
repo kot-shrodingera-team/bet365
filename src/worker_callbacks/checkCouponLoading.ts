@@ -120,15 +120,30 @@ const check = (): boolean => {
     log('Обработка ставки завершена (в купоне были изменения)', 'orange');
     return false;
   }
+
+  const receiptTitleElement = document.querySelector(
+    '.bss-ReceiptContent_Title'
+  );
+  if (
+    receiptTitleElement &&
+    receiptTitleElement.textContent.trim() === 'Bet Placed'
+  ) {
+    log('Обработка ставки завершена (Bet Placed)', 'orange');
+    return false;
+  }
+
   const betslipPlaceBetButtonText = document.querySelector(
     '.bss-PlaceBetButton_Text'
   );
-  if (
-    betslipPlaceBetButtonText &&
-    betslipPlaceBetButtonText.textContent === 'Total Stake'
-  ) {
-    log('Обработка ставки завершена (Total Stake)', 'orange');
-    return false;
+  if (betslipPlaceBetButtonText) {
+    if (betslipPlaceBetButtonText.textContent === 'Total Stake') {
+      log('Обработка ставки завершена (Total Stake)', 'orange');
+      return false;
+    }
+    if (betslipPlaceBetButtonText.textContent === 'Total Risk') {
+      log('Обработка ставки завершена (Total Risk)', 'orange');
+      return false;
+    }
   }
   const footerMessageElement = document.querySelector(
     '.bss-Footer_MessageBody'

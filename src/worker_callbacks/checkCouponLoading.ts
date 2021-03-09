@@ -145,6 +145,7 @@ const check = (): boolean => {
       return false;
     }
   }
+
   const footerMessageElement = document.querySelector(
     '.bss-Footer_MessageBody'
   );

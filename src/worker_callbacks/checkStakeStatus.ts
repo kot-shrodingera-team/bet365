@@ -64,9 +64,34 @@ const checkStakeStatus = (): boolean => {
   //   updateBalance();
   //   return true;
   // }
+
+  const receiptTitleElement = document.querySelector(
+    '.bss-ReceiptContent_Title'
+  );
+  if (
+    receiptTitleElement &&
+    receiptTitleElement.textContent.trim() === 'Bet Placed'
+  ) {
+    log('Ставка принята (Bet Placed)', 'green');
+    updateBalance();
+    return true;
+  }
+
   const betslipPlaceBetButtonText = document.querySelector(
     '.bss-PlaceBetButton_Text'
   );
+  if (betslipPlaceBetButtonText) {
+    if (betslipPlaceBetButtonText.textContent === 'Total Stake') {
+      log('Ставка принята (Total Stake)', 'green');
+      updateBalance();
+      return true;
+    }
+    if (betslipPlaceBetButtonText.textContent === 'Total Risk') {
+      log('Ставка принята (Total Risk)', 'green');
+      updateBalance();
+      return true;
+    }
+  }
   if (
     betslipPlaceBetButtonText &&
     betslipPlaceBetButtonText.textContent.trim() === 'Total Stake'
@@ -75,6 +100,7 @@ const checkStakeStatus = (): boolean => {
     updateBalance();
     return true;
   }
+
   const betslipPlaceBetErrorMessageElement = document.querySelector(
     '.bs-PlaceBetErrorMessage_Contents'
   );

@@ -37,15 +37,9 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const ns_favouriteslib_ui: unknown;
   interface Window {
-    _xx: {
-      onDisconnect: {
-        addListener: (ls: () => unknown) => unknown;
-      };
-    };
-    chrome: {
-      runtime: {
-        connect: () => unknown;
-      };
+    germesData: {
+      acceptChangesDelayStart: Date;
+      test: any;
     };
   }
 }

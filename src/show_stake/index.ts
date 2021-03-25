@@ -49,6 +49,23 @@ const showStake = async (): Promise<void> => {
     return;
   }
 
+  if (worker.IsRu && worker.Currency !== 'RUR') {
+    jsFail(
+      `Выбран ЦУПИС, но валюта не рубли (${worker.Currency}). Поменяйте валюту в настройках БК`
+    );
+    return;
+  }
+
+  if (
+    /^(www\.)?bet365.ru$/.test(window.location.hostname) &&
+    worker.Currency !== 'RUR'
+  ) {
+    jsFail(
+      `Открыта RU версия сайта, но валюта не рубли (${worker.Currency}). Поменяйте валюту в настройках БК`
+    );
+    return;
+  }
+
   const rawBetData = worker.BetId.split('_');
   if (rawBetData.length < 5) {
     jsFail('Некорректный формат данных о ставке. Сообщите в ТП');

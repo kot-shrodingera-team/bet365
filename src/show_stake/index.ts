@@ -14,7 +14,6 @@ import {
 import getStakeCount from '../stake_info/getStakeCount';
 import getCurrentEventName from '../checkBet/getCurrentEventName';
 import changeToStandardBetslip from './changeToStandardBetslip';
-import checkBet from '../checkBet';
 import checkAuth, { authStateReady } from '../stake_info/checkAuth';
 import clearCoupon from './clearCoupon';
 import checkCurrentLanguage from '../initialization/checkCurrentLanguage';
@@ -302,10 +301,6 @@ const showStake = async (): Promise<void> => {
         return;
       }
     }
-  }
-  if (!checkBet(true).correctness) {
-    jsFail('Ставка не соответствует росписи');
-    return;
   }
   const couponOpenDelayRegex = /coupon_open_delay=(\d+(?:\.\d+)?)/i;
   const couponOpenDelayMatch = config.match(couponOpenDelayRegex);

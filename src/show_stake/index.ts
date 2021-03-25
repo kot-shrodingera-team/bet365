@@ -283,11 +283,15 @@ const showStake = async (): Promise<void> => {
   // Если есть параметр, нужно его дождаться
   const { param } = JSON.parse(worker.ForkObj) as WorkerBetObject;
   if (param) {
-    const betslipBetDetailsElement = document.querySelector(
+    const marketNameElement = document.querySelector(
       '.bss-NormalBetItem_Market'
     );
-    const betslipBetDetails = betslipBetDetailsElement.textContent.trim();
-    if (!/^Draw No Bet$/i.test(betslipBetDetails)) {
+    if (!marketNameElement) {
+      jsFail('Не найдена роспись ставки');
+      return;
+    }
+    const marketName = marketNameElement.textContent.trim();
+    if (!/^(Draw No Bet)$/i.test(marketName)) {
       log(
         'Ставка с параметром, ожидаем появления параметра в купоне',
         'steelblue'

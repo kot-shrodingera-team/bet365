@@ -34,6 +34,8 @@ const jsFail = (message = ''): void => {
 
 const showStake = async (): Promise<void> => {
   couponOpenning = true;
+  log(`Событие: ${worker.TeamOne} vs ${worker.TeamTwo}`, 'steelblue');
+  log(`Ставка: ${worker.BetName}`, 'steelblue');
   if (
     worker.GetSessionData &&
     worker.GetSessionData('Bet365 Blocked') === '1'
@@ -309,6 +311,28 @@ const showStake = async (): Promise<void> => {
     log(`Задержка ${delay} секунд после открытия купона`, 'orange');
     await sleep(delay * 1000);
   }
+  const eventNameSelector = '.bss-NormalBetItem_FixtureDescription';
+  const marketNameSelector = '.bss-NormalBetItem_Market';
+  const betNameSelector = '.bss-NormalBetItem_Title';
+  const eventNameElement = document.querySelector(eventNameSelector);
+  if (!eventNameElement) {
+    jsFail('Не найдено событие открытой ставки');
+    return;
+  }
+  const marketNameElement = document.querySelector(marketNameSelector);
+  if (!marketNameElement) {
+    jsFail('Не найден маркет открытой ставки');
+    return;
+  }
+  const betNameElement = document.querySelector(betNameSelector);
+  if (!betNameElement) {
+    jsFail('Не найдена роспись открытой ставки');
+    return;
+  }
+  const eventName = eventNameElement.textContent.trim();
+  const marketName = marketNameElement.textContent.trim();
+  const betName = betNameElement.textContent.trim();
+  log(`Открыта ставка\n${eventName}\n${marketName}\n${betName}`, 'steelblue');
   log('Ставка успешно открыта', 'green');
   couponOpenning = false;
   worker.JSStop();

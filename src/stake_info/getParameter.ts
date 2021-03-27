@@ -59,6 +59,7 @@ const getParameter = (): number => {
         );
         return -9999;
       }
+      return result;
     }
   }
 

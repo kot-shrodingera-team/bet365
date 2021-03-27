@@ -1,4 +1,6 @@
-import { log } from '@kot-shrodingera-team/germes-utils';
+import { log, ri } from '@kot-shrodingera-team/germes-utils';
+import getSiteTeamNames from '../checkBet/getSiteTeamNames';
+import { formatParameterRegex, getHandicapScoreOffset } from '../checkBet/util';
 
 export const parseParameter = (parameter: string): number => {
   const singleParameterRegex = /^[+-]?\d+\.\d+$/;
@@ -47,6 +49,31 @@ const getParameter = (): number => {
     ) {
       betName = betName.replace(betslipHandicap, ` ${betslipHandicap}`);
     }
+  }
+
+  const { market, bet_type: betType } = JSON.parse(worker.ForkObj);
+  let handicapOffset = 0;
+  if (worker.SportId === 1 && (market === 'F' || betType === 'HANDICAP')) {
+    log('Фора от счёта в футболе', 'steelblue');
+    const teamNames = getSiteTeamNames();
+    const teamRegex = ri`${teamNames.teamOne}|${teamNames.teamTwo}`;
+    const gameScoreRegex = /\(\d+-\d+\)/;
+    const betslipHandicapRegex = ri`^(${gameScoreRegex}) (${teamRegex}) (${formatParameterRegex(
+      { sign: true, double: true }
+    )})$`;
+    const betslipMatch = betName.match(betslipHandicapRegex);
+    if (!betslipMatch) {
+      log('В купоне неподходящая роспись', 'crimson');
+      return -9999;
+    }
+    const handicapPlayer = ri`${betslipMatch[2]}`.test(teamNames.teamOne)
+      ? 1
+      : 2;
+    handicapOffset = getHandicapScoreOffset(betslipMatch[1], handicapPlayer);
+  }
+
+  if (betslipHandicapElement) {
+    const betslipHandicap = betslipHandicapElement.textContent.trim();
 
     if (betslipHandicap === '') {
       log('Отдельный элемент параметра пуст', 'white', true);
@@ -59,7 +86,7 @@ const getParameter = (): number => {
         );
         return -9999;
       }
-      return result;
+      return result + handicapOffset;
     }
   }
 

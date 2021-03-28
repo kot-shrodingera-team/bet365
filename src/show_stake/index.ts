@@ -67,6 +67,16 @@ const showStake = async (): Promise<void> => {
     return;
   }
 
+  if (
+    !/^(www\.)?bet365.ru$/.test(new URL(worker.BookmakerMainUrl).hostname) &&
+    worker.Currency === 'RUR'
+  ) {
+    jsFail(
+      'Валюта рубли, но зеркало не bet365.ru. Поменяйте зеркало в настройках БК'
+    );
+    return;
+  }
+
   const rawBetData = worker.BetId.split('_');
   if (rawBetData.length < 5) {
     jsFail('Некорректный формат данных о ставке. Сообщите в ТП');

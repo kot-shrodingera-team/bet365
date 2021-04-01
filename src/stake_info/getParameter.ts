@@ -3,8 +3,8 @@ import getSiteTeamNames from '../checkBet/getSiteTeamNames';
 import { formatParameterRegex, getHandicapScoreOffset } from '../checkBet/util';
 
 export const parseParameter = (parameter: string): number => {
-  const singleParameterRegex = /^[+-]?\d+\.\d+$/;
-  const doubleParameterRegex = /^([+-]?\d+\.\d+),([+-]?\d+\.\d+)$/;
+  const singleParameterRegex = /^[+-]?\d+(?:\.\d+)?$/;
+  const doubleParameterRegex = /^([+-]?\d+(?:\.\d+)?),([+-]?\d+(?:\.\d+)?)$/;
   const doubleParameterMatch = parameter.match(doubleParameterRegex);
   if (doubleParameterMatch) {
     const firstParameter = Number(doubleParameterMatch[1]);

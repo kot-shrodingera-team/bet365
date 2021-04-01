@@ -1,202 +1,332 @@
 import checkCouponLoadingGenerator from '@kot-shrodingera-team/germes-generators/worker_callbacks/checkCouponLoading';
-import { log, stakeInfoString } from '@kot-shrodingera-team/germes-utils';
-import { getConfig } from '../config';
 import {
-  checkRestriction,
-  accountBlocked,
+  log,
+  getElement,
+  awaiter,
+  stakeInfoString,
+  sleep,
+} from '@kot-shrodingera-team/germes-utils';
+import {
+  accountRestricted,
+  accountStep2,
+  accountSurvey,
 } from '../initialization/accountChecks';
+// import { JsFailError } from '@kot-shrodingera-team/germes-utils/errors';
+import getCouponError, {
+  CouponError,
+  getCouponErrorText,
+  updateMaximumStake,
+} from '../show_stake/helpers/getCouponError';
+// import openBet from '../show_stake/openBet';
 import { getDoStakeTime } from '../stake_info/doStakeTime';
-import { updateMaximumStake } from '../stake_info/getMaximumStake';
 
-let isNewMax = false;
+const bookmakerName = 'Bet365';
 
-export const setIsNewMax = (newMax: boolean): void => {
-  isNewMax = newMax;
-};
-
-let referBetConfirmation = false;
-
-export const resetReferBetConfirmation = (): void => {
-  referBetConfirmation = false;
-};
-
-export const getReferBetConfirmation = (): boolean => {
-  return referBetConfirmation;
-};
-
-const check = (): boolean => {
-  if (checkRestriction()) {
-    accountBlocked();
-    return false;
+const timeout = 50000;
+const getRemainingTimeout = (maximum?: number) => {
+  const result = timeout - (new Date().getTime() - getDoStakeTime().getTime());
+  if (maximum !== undefined && timeout > maximum) {
+    return maximum;
   }
-  const processingButton = document.querySelector('.bss-ProcessingButton');
-  const referBetConfirmationElement = document.querySelector(
-    '.bss-ReferBetConfirmation'
-  );
-  if (referBetConfirmationElement) {
-    if (processingButton) {
-      log('Обработка ставки (Refer Bet Confirmation индикатор)', 'tan');
-      return true;
-    }
-    log('Refer Bet Confirmation', 'steelblue');
-    const placeNowValueElement = document.querySelector(
-      '.bss-ReferBetConfirmation_PlaceNow .bss-ReferBetConfirmation_Referred-value'
-    );
-    const referredValueElement = document.querySelector(
-      '.bss-ReferBetConfirmation_Referred .bss-ReferBetConfirmation_Referred-value'
-    );
-    const placeBetAndReferButton = document.querySelector(
-      '.bss-PlaceBetReferButton_Text'
-    ) as HTMLElement;
-    if (
-      placeNowValueElement &&
-      referredValueElement &&
-      placeBetAndReferButton
-    ) {
-      const valueRegex = /(\d+(?:\.\d+)?)/;
-      const placeNowValueText = placeNowValueElement.textContent.trim();
-      const placeNowValueMatch = placeNowValueText.match(valueRegex);
-      const referredValueText = referredValueElement.textContent.trim();
-      const referredValueMatch = referredValueText.match(valueRegex);
-      const placeNowValue = placeNowValueMatch[1];
-      const referredValue = referredValueMatch[1];
+  return result;
+};
 
-      const message =
-        `Bet365: Refer Bet Confirmation\n` +
-        `${stakeInfoString()}\n` +
-        `Place Now Value: ${placeNowValue}\n` +
-        `Referred Value: ${referredValue}`;
-      log(message, 'steelblue');
-      worker.Helper.SendInformedMessage(message);
-      placeBetAndReferButton.click();
-      log('Нажимаем на кнопку "Place Bet and Refer"', 'orange');
-      referBetConfirmation = true;
-      return true;
+const asyncCheck = async () => {
+  const error = (message?: string) => {
+    if (message !== undefined) {
+      log(message, 'crimson');
     }
-    if (processingButton) {
-      log('Обработка ставки (Refer Bet Confirmation индикатор)', 'tan');
-      return true;
-    }
-    log('Refer Bet Confirmation без индикатора', 'tan');
-  }
-  const betslipPlaceBetErrorMessageElement = document.querySelector(
-    '.bs-PlaceBetErrorMessage_Contents'
-  );
-  if (betslipPlaceBetErrorMessageElement) {
-    const errorText = betslipPlaceBetErrorMessageElement.textContent.trim();
-    if (
-      errorText ===
-      'Please check My Bets for confirmation that your bet has been successfully placed.'
-    ) {
-      log('Обработка ставки завершена (check My Bets)', 'orange');
+    window.germesData.betProcessingStep = 'error';
+  };
+  const errorInform = (informedMessage: string, botMessage?: string) => {
+    worker.Helper.SendInformedMessage(
+      `В ${bookmakerName} произошла ошибка принятия ставки:\n${informedMessage}` +
+        `Бот засчитал ставку как не принятую\n` +
+        `${stakeInfoString()}`
+    );
+    if (botMessage) {
+      log(botMessage, 'crimson');
     } else {
-      log('Обработка ставки завершена (ошибка ставки)', 'orange');
+      log(informedMessage, 'crimson');
     }
-    return false;
-  }
-  const acceptButton = document.querySelector('.bs-AcceptButton');
-  const timePassedSinceDoStake =
-    new Date().getTime() - getDoStakeTime().getTime();
-  if (acceptButton) {
-    if (isNewMax) {
-      if (timePassedSinceDoStake < 2000) {
-        log(
-          'Обработка ставки (задержка в 2 секунды при появлении макса)',
-          'tan'
-        );
-        return true;
+    window.germesData.betProcessingStep = 'error';
+  };
+  const success = (message?: string) => {
+    if (message !== undefined) {
+      log(message, 'steelblue');
+    }
+    window.germesData.betProcessingStep = 'success';
+  };
+  // const reopen = async (message?: string) => {
+  //   if (message !== undefined) {
+  //     log(message, 'crimson');
+  //   }
+  //   window.germesData.betProcessingStep = 'reopen';
+  //   log('Переоткрываем купон', 'orange');
+  //   try {
+  //     await openBet();
+  //     log('Ставка успешно переоткрыта', 'green');
+  //     window.germesData.betProcessingStep = 'reopened';
+  //   } catch (reopenError) {
+  //     if (reopenError instanceof JsFailError) {
+  //       log(reopenError.message, 'red');
+  //       window.germesData.betProcessingStep = 'error';
+  //     } else {
+  //       log(reopenError.message, 'red');
+  //       window.germesData.betProcessingStep = 'error';
+  //     }
+  //   }
+  // };
+
+  const loaderSelector = '.bss-ProcessingButton';
+  const referBetSelector = '.bss-ReferBetConfirmation';
+  const errorSelector = '.bss-Footer_MessageBody';
+  const placeBetErrorSelector = '.bs-PlaceBetErrorMessage_Contents';
+  const acceptButtonSelector = '.bs-AcceptButton';
+  const receiptTickSelector = '.bss-ReceiptContent_Tick';
+
+  window.germesData.betProcessingStep = 'waitingForLoaderOrResult';
+
+  await Promise.any([
+    getElement(loaderSelector, getRemainingTimeout()),
+    getElement(referBetSelector, getRemainingTimeout()),
+    getElement(errorSelector, getRemainingTimeout()),
+    getElement(placeBetErrorSelector, getRemainingTimeout()),
+    getElement(acceptButtonSelector, getRemainingTimeout()),
+    getElement(receiptTickSelector, getRemainingTimeout()),
+  ]);
+
+  const loaderElement = document.querySelector(loaderSelector);
+
+  if (loaderElement) {
+    log('Появился индикатор', 'steelblue');
+    window.germesData.betProcessingAdditionalInfo = 'индикатор';
+    awaiter(
+      () => {
+        return document.querySelector(loaderSelector) === null;
+      },
+      getRemainingTimeout(),
+      100
+    ).then((loaderDissappeared) => {
+      if (loaderDissappeared) {
+        log('Исчез индикатор', 'steelblue');
+        window.germesData.betProcessingAdditionalInfo = null;
       }
-      log(
-        'Обработка ставки завершена (задержка в 2 секунды при появлении макса)',
-        'orange'
+    });
+
+    window.germesData.betProcessingStep = 'waitingForResult';
+    await Promise.any([
+      getElement(referBetSelector, getRemainingTimeout()),
+      getElement(errorSelector, getRemainingTimeout()),
+      getElement(placeBetErrorSelector, getRemainingTimeout()),
+      getElement(acceptButtonSelector, getRemainingTimeout()),
+      getElement(receiptTickSelector, getRemainingTimeout()),
+    ]);
+  }
+
+  const referBetElement = document.querySelector(referBetSelector);
+  if (referBetElement) {
+    log('Refer Bet Confirmation', 'steelblue');
+    const placeNowValueSelector =
+      '.bss-ReferBetConfirmation_PlaceNow .bss-ReferBetConfirmation_Referred-value';
+    const referredValueSelector =
+      '.bss-ReferBetConfirmation_Referred .bss-ReferBetConfirmation_Referred-value';
+    const placeBetAndReferButtonSelector = '.bss-PlaceBetReferButton_Text';
+
+    await Promise.all([
+      getElement(placeNowValueSelector, getRemainingTimeout()),
+      getElement(referredValueSelector, getRemainingTimeout()),
+      getElement(placeBetAndReferButtonSelector, getRemainingTimeout()),
+    ]);
+
+    const placeNowValueElement = document.querySelector(placeNowValueSelector);
+    const referredValueElement = document.querySelector(referredValueSelector);
+    const placeBetAndReferButton = document.querySelector<HTMLElement>(
+      placeBetAndReferButtonSelector
+    );
+
+    if (
+      !placeNowValueElement ||
+      !referredValueElement ||
+      !placeBetAndReferButton
+    ) {
+      return errorInform(
+        'Не дождались результата принятия ставки при Refer Bet Confirmation'
       );
-      return false;
     }
-    if (updateMaximumStake()) {
-      log('Обработка ставки (появился новый макс)', 'tan');
-      isNewMax = true;
-      return true;
+
+    const placeNowValueText = placeNowValueElement.textContent.trim();
+    const referredValueText = referredValueElement.textContent.trim();
+    const valueRegex = /(\d+(?:\.\d+)?)/;
+    const placeNowValueMatch = placeNowValueText.match(valueRegex);
+    if (!placeNowValueMatch) {
+      return errorInform(
+        `Не удалось определить значение placeNow: ${placeNowValueText}`
+      );
     }
-    log('Обработка ставки завершена (в купоне были изменения)', 'orange');
-    return false;
+    const referredValueMatch = referredValueText.match(valueRegex);
+    if (!referredValueMatch) {
+      return errorInform(
+        `Не удалось определить значение placeNow: ${referredValueText}`
+      );
+    }
+    window.germesData.referredBetData.placeNowValue = Number(
+      placeNowValueMatch[1]
+    );
+    window.germesData.referredBetData.referredValue = Number(
+      referredValueMatch[1]
+    );
+
+    placeBetAndReferButton.click();
+    log('Нажимаем на кнопку "Place Bet and Refer"', 'orange');
+
+    await Promise.any([
+      getElement(errorSelector, getRemainingTimeout()),
+      getElement(placeBetErrorSelector, getRemainingTimeout()),
+      getElement(acceptButtonSelector, getRemainingTimeout()),
+      getElement(receiptTickSelector, getRemainingTimeout()),
+    ]);
   }
 
-  const receiptTitleElement = document.querySelector(
-    '.bss-ReceiptContent_Title'
-  );
-  if (
-    receiptTitleElement &&
-    receiptTitleElement.textContent.trim() === 'Bet Placed'
-  ) {
-    log('Обработка ставки завершена (Bet Placed)', 'orange');
-    return false;
-  }
+  const errorElement = document.querySelector(errorSelector);
+  if (errorElement) {
+    const couponError = getCouponError();
+    const acceptButton = document.querySelector<HTMLElement>(
+      '.bs-AcceptButton'
+    );
 
-  const betslipPlaceBetButtonText = document.querySelector(
-    '.bss-PlaceBetButton_Text'
-  );
-  if (betslipPlaceBetButtonText) {
-    if (betslipPlaceBetButtonText.textContent === 'Total Stake') {
-      log('Обработка ставки завершена (Total Stake)', 'orange');
-      return false;
+    if (couponError === CouponError.AccountRestricted) {
+      accountRestricted();
+      return error();
     }
-    if (betslipPlaceBetButtonText.textContent === 'Total Risk') {
-      log('Обработка ставки завершена (Total Risk)', 'orange');
-      return false;
+    if (couponError === CouponError.AccountStep2) {
+      accountStep2();
+      return error();
     }
-  }
-
-  const footerMessageElement = document.querySelector(
-    '.bss-Footer_MessageBody'
-  );
-  if (footerMessageElement) {
-    const footerMessage = footerMessageElement.textContent.trim();
+    if (couponError === CouponError.AccounSurvey) {
+      accountSurvey();
+      return error();
+    }
+    if (couponError === CouponError.OddsChanged) {
+      if (!acceptButton) {
+        log('Не найдена кнопка принятия изменений', 'crimson');
+      } else {
+        log('Принимаем изменения', 'orange');
+        acceptButton.click();
+      }
+      return error('Изменение котировок');
+    }
     if (
-      /In accordance with licensing conditions we are required to verify your age and identity. Certain restrictions may be applied to your account until we are able to verify your details. Please go to the Know Your Customer page in Members and provide the requested information./i.test(
-        footerMessage
-      )
+      couponError === CouponError.NewMaximum ||
+      couponError === CouponError.NewMaximumShort ||
+      couponError === CouponError.UnknownMaximum
     ) {
-      log('Обработка ставки завершена (ошибка, не пройден Step 2)', 'orange');
-      return false;
+      updateMaximumStake();
+      if (!acceptButton) {
+        log('Не найдена кнопка принятия изменений', 'crimson');
+      } else {
+        log('Принимаем изменения', 'orange');
+        acceptButton.click();
+      }
+      const delay =
+        2 - new Date().getTime() - window.germesData.doStakeTime.getTime();
+      if (delay > 0) {
+        log('Задержка после появления максимума');
+        await sleep(delay);
+      }
+      return error('Превышена максимальная ставка');
     }
-    if (
-      /As part of the ongoing management of your account we need you to answer a set of questions relating to Responsible Gambling. Certain restrictions may be applied to your account until you have successfully completed this. You can answer these questions now by going to the Self-Assessment page in Members./i.test(
-        footerMessage
-      )
-    ) {
-      log('Обработка ставки завершена (ошибка, не пройден опрос)', 'orange');
-      return false;
+    if (couponError === CouponError.Unknown) {
+      const couponErrorText = getCouponErrorText();
+      log(couponErrorText, 'tomato');
+      return errorInform(
+        `В купоне неизвестная ошибка:\n${couponErrorText}`,
+        'В купоне неизвестная ошибка'
+      );
     }
+    return errorInform('В купоне неизвестная ошибка');
   }
-  const placingIndicatorStrictCheckRegex = /placing_indicator_strict_check=(\d+(?:\.\d+)?)/i;
-  const placingIndicatorStrictCheckMatch = getConfig().match(
-    placingIndicatorStrictCheckRegex
-  );
-  if (placingIndicatorStrictCheckMatch) {
-    const placingIndicatorStrictCheckDelay =
-      1000 * Number(placingIndicatorStrictCheckMatch[1]);
-    if (timePassedSinceDoStake <= placingIndicatorStrictCheckDelay) {
-      log('Обработка ставки (задержка)', 'tan');
+
+  const placeBetErrorElement = document.querySelector(placeBetErrorSelector);
+  if (placeBetErrorElement) {
+    const placeBetErrorText = placeBetErrorElement.textContent.trim();
+
+    const checkMyBetsRegex = /Please check My Bets for confirmation that your bet has been successfully placed./i;
+    if (checkMyBetsRegex.test(placeBetErrorText)) {
+      log('Обработка ставки завершена (check My Bets)', 'orange');
+      const message =
+        `В Bet365 появилось окно о необходимости проверки принятия ставки в "My Bets":\n${placeBetErrorText}` +
+        `Бот засчитал ставку как проставленную\n` +
+        `${stakeInfoString()}\n` +
+        `Пожалуйста, проверьте самостоятельно. Если всё плохо - пишите в ТП`;
+      worker.Helper.SendInformedMessage(message);
+      return success('Ставка возможно принята (Check My Bets)');
+    }
+    log('В купоне неизвестная ошибка', 'crimson');
+    log(placeBetErrorText, 'tomato');
+    return errorInform(placeBetErrorText, 'В купоне ошибка ставки');
+  }
+
+  const acceptButtonElement = document.querySelector(acceptButtonSelector);
+  if (acceptButtonElement) {
+    return errorInform('Появилась кнопка принятия изменений, но нет сообщения');
+  }
+
+  const receiptTickElement = document.querySelector(receiptTickSelector);
+  if (receiptTickElement) {
+    if (referBetElement) {
+      const referBetDeclined = document.querySelector(
+        '.bss-ReferralInfo_Label-partialdecline'
+      );
+
+      if (referBetDeclined) {
+        const message =
+          `Bet365: Refer Bet Declined\n` +
+          `${stakeInfoString()}\n` +
+          `Place Now Value: ${window.germesData.referredBetData.placeNowValue}\n` +
+          `Referred Value: ${window.germesData.referredBetData.referredValue}`;
+        log('Refer Bet Declined', 'steelblue');
+        worker.Helper.SendInformedMessage(message);
+      } else {
+        const message =
+          `Bet365: Refer Bet Accepted\n` +
+          `${stakeInfoString()}\n` +
+          `Place Now Value: ${window.germesData.referredBetData.placeNowValue}\n` +
+          `Referred Value: ${window.germesData.referredBetData.referredValue}`;
+        log('Refer Bet Accepted', 'steelblue');
+        worker.Helper.SendInformedMessage(message);
+      }
+    }
+    return success('Появилась иконка успешной ставки');
+  }
+
+  return errorInform('Не дождались результата принятия ставки');
+};
+
+const check = () => {
+  const step = window.germesData.betProcessingStep;
+  const additionalInfo = window.germesData.betProcessingAdditionalInfo
+    ? ` (${window.germesData.betProcessingAdditionalInfo})`
+    : '';
+  switch (step) {
+    case 'beforeStart':
+      asyncCheck();
       return true;
-    }
-    if (processingButton) {
-      log('Обработка ставки (индикатор)', 'tan');
+    case 'error':
+    case 'success':
+    case 'reopened':
+      log(`Обработка ставки завершена (${step})${additionalInfo}`, 'orange');
+      return false;
+    default:
+      log(`Обработка ставки (${step})${additionalInfo}`, 'tan');
       return true;
-    }
-    log('Обработка ставки завершена (нет индикатора)', 'orange');
-    return false;
   }
-  if (processingButton) {
-    log('Обработка ставки (индикатор)', 'tan');
-  } else {
-    log('Обработка ставки (нет индикатора)', 'tan');
-  }
-  return true;
 };
 
 const checkCouponLoading = checkCouponLoadingGenerator({
-  bookmakerName: 'bet365',
   getDoStakeTime,
+  bookmakerName,
+  timeout,
   check,
 });
 

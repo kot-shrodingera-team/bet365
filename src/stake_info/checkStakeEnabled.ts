@@ -1,47 +1,70 @@
 import checkStakeEnabledGenerator from '@kot-shrodingera-team/germes-generators/stake_info/checkStakeEnabled';
 import { log } from '@kot-shrodingera-team/germes-utils';
 import {
-  checkRestriction,
-  accountBlocked,
+  accountRestricted,
+  accountStep2,
+  accountSurvey,
 } from '../initialization/accountChecks';
+import getCouponError, {
+  CouponError,
+  getCouponErrorText,
+  updateMaximumStake,
+} from '../show_stake/helpers/getCouponError';
 import getStakeCount from './getStakeCount';
 
 const preCheck = (): boolean => {
-  if (checkRestriction()) {
-    accountBlocked();
+  const couponError = getCouponError();
+  const acceptButton = document.querySelector<HTMLElement>('.bs-AcceptButton');
+
+  if (couponError === CouponError.AccountRestricted) {
+    accountRestricted();
     return false;
   }
-  const footerMessageElement = document.querySelector(
-    '.bss-Footer_MessageBody'
-  );
-  if (footerMessageElement) {
-    const footerMessage = footerMessageElement.textContent.trim();
-    if (
-      /In accordance with licensing conditions we are required to verify your age and identity. Certain restrictions may be applied to your account until we are able to verify your details. Please go to the Know Your Customer page in Members and provide the requested information./i.test(
-        footerMessage
-      )
-    ) {
-      log('Ставка недоступна (ошибка, не пройден Step 2)', 'crimson');
+  if (couponError === CouponError.AccountStep2) {
+    accountStep2();
+    return false;
+  }
+  if (couponError === CouponError.AccounSurvey) {
+    accountSurvey();
+    return false;
+  }
+  if (couponError === CouponError.OddsChanged) {
+    if (!acceptButton) {
+      log('Не найдена кнопка принятия изменений', 'crimson');
       return false;
     }
-    if (
-      /As part of the ongoing management of your account we need you to answer a set of questions relating to Responsible Gambling. Certain restrictions may be applied to your account until you have successfully completed this. You can answer these questions now by going to the Self-Assessment page in Members./i.test(
-        footerMessage
-      )
-    ) {
-      log('Ставка недоступна (ошибка, не пройден опрос)', 'crimson');
+    log('Принимаем изменения', 'orange');
+    acceptButton.click();
+
+    return true;
+  }
+  if (
+    couponError === CouponError.NewMaximum ||
+    couponError === CouponError.NewMaximumShort ||
+    couponError === CouponError.UnknownMaximum
+  ) {
+    updateMaximumStake();
+    if (!acceptButton) {
+      log('Не найдена кнопка принятия изменений', 'crimson');
       return false;
     }
+    log('Принимаем изменения', 'orange');
+    acceptButton.click();
+
+    return true;
+  }
+  if (couponError === CouponError.Unknown) {
+    log('В купоне неизвестная ошибка', 'crimson');
+    const couponErrorText = getCouponErrorText();
+    log(couponErrorText, 'tomato');
+    return false;
   }
   const betslipModule = document.querySelector('.bsm-BetslipStandardModule');
   if (
     betslipModule &&
     ![...betslipModule.classList].includes('bsm-BetslipStandardModule_Expanded')
   ) {
-    log(
-      'Ошибка определения доступности ставки: купон не отображается',
-      'crimson'
-    );
+    log('Купон не развёрнут', 'crimson');
     return false;
   }
   return true;
@@ -59,6 +82,13 @@ const checkStakeEnabled = checkStakeEnabledGenerator({
       },
     ],
   },
+  // errorsCheck: [
+  //   {
+  //     selector: '',
+  //     message: '',
+  //   },
+  // ],
+  // context: () => document,
 });
 
 export default checkStakeEnabled;

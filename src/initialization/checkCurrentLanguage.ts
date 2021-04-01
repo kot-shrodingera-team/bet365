@@ -1,21 +1,21 @@
 import { log, getElement } from '@kot-shrodingera-team/germes-utils';
 
-const checkCurrentLanguage = async (): Promise<boolean> => {
+const checkCurrentLanguage = async (): Promise<number> => {
   log('Проверка языка', 'steelblue');
-  const accountIcon = document.querySelector(
+  const accountIcon = document.querySelector<HTMLElement>(
     '.hm-MainHeaderMembersWide_MembersMenuIcon'
-  ) as HTMLElement;
+  );
   if (!accountIcon) {
     log('Ошибка проверки языка: не найдена кнопка аккаунта', 'crimson');
-    return false;
+    return 0;
   }
   accountIcon.click();
-  const accountPreferencesButton = (await getElement(
+  const accountPreferencesButton = await getElement<HTMLElement>(
     '.um-PreferencesTabButton'
-  )) as HTMLElement;
+  );
   if (!accountPreferencesButton) {
     log('Ошибка проверки языка: не найдена кнопка настроек', 'crimson');
-    return false;
+    return 0;
   }
   accountPreferencesButton.click();
   const languageLabel = document.querySelector(
@@ -23,17 +23,19 @@ const checkCurrentLanguage = async (): Promise<boolean> => {
   ) as HTMLElement;
   if (!languageLabel) {
     log('Ошибка проверки языка: не найдено значение опции языка', 'crimson');
-    return false;
+    return 0;
   }
   const currentLanguage = languageLabel.textContent.trim();
   if (currentLanguage === 'English') {
     accountIcon.click();
-    return true;
+    return 1;
   }
   languageLabel.click();
   const languageOptions = [
-    ...document.querySelectorAll('.um-PreferenceDropDownContainer_ItemLabel'),
-  ] as HTMLElement[];
+    ...document.querySelectorAll<HTMLElement>(
+      '.um-PreferenceDropDownContainer_ItemLabel'
+    ),
+  ];
   const englishLanguageOption = languageOptions.find(
     (option) => option.textContent.trim() === 'English'
   );
@@ -42,10 +44,10 @@ const checkCurrentLanguage = async (): Promise<boolean> => {
       'Ошибка проверки языка: не найден английский язык в списке языков',
       'crimson'
     );
-    return false;
+    return 0;
   }
   englishLanguageOption.click();
-  return true;
+  return -1;
 };
 
 export default checkCurrentLanguage;

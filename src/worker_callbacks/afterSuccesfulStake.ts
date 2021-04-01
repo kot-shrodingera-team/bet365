@@ -1,25 +1,35 @@
-import { log, toFormData } from '@kot-shrodingera-team/germes-utils';
-import { getConfig } from '../config';
+// import getCoefficientGenerator from '@kot-shrodingera-team/germes-generators/stake_info/getCoefficient';
+import {
+  getWorkerParameter,
+  log,
+  toFormData,
+} from '@kot-shrodingera-team/germes-utils';
+import getCoefficient from '../stake_info/getCoefficient';
+
+// const getResultCoefficientText = (): string => {
+//   return null;
+// };
+
+// const getResultCoefficient = getCoefficientGenerator({
+//   coefficientSelector: '',
+//   getCoefficientText: getResultCoefficientText,
+//   replaceDataArray: [
+//     {
+//       searchValue: '',
+//       replaceValue: '',
+//     },
+//   ],
+//   removeRegex: /[\s,']/g,
+//   coefficientRegex: /(\d+(?:\.\d+)?)/,
+//   context: () => document,
+// });
+
+const getResultCoefficient = getCoefficient;
 
 const afterSuccesfulStake = (): void => {
-  const lastStakeCoefficient = document.querySelector('.bs-OddsLabel');
-  if (!lastStakeCoefficient) {
-    log(
-      'Ошибка обновления коэффициента после успешной ставки: не найден коэффициент',
-      'crimson'
-    );
-    return;
-  }
-  const resultCoefficientText = lastStakeCoefficient.textContent.trim();
-  const resultCoefficient = Number(resultCoefficientText);
-  if (Number.isNaN(resultCoefficient)) {
-    log(
-      `Ошибка обновления коэффициента после успешной ставки: непонятный формат коэффициента: "${resultCoefficientText}"`,
-      'crimson'
-    );
-    return;
-  }
-  if (resultCoefficient !== worker.StakeInfo.Coef) {
+  log('Обновление итогового коэффициента', 'steelblue');
+  const resultCoefficient = getResultCoefficient();
+  if (resultCoefficient && resultCoefficient !== worker.StakeInfo.Coef) {
     log(
       `Коеффициент изменился: ${worker.StakeInfo.Coef} => ${resultCoefficient}`,
       'orange'
@@ -28,7 +38,7 @@ const afterSuccesfulStake = (): void => {
     return;
   }
   log('Коеффициент не изменился', 'lightblue');
-  if (getConfig().includes('send_bet_id')) {
+  if (getWorkerParameter('sendBetRef')) {
     const betReferenceElement = document.querySelector(
       '.bss-ReceiptContent_BetRef'
     );

@@ -1,13 +1,11 @@
 import { log } from '@kot-shrodingera-team/germes-utils';
 import getBalance from './getBalance';
 
-let maximumStake = -1;
-
 export const setMaximumStake = (newMaximumStake: number): void => {
-  maximumStake = newMaximumStake;
+  window.germesData.maximumStake = newMaximumStake;
 };
 export const clearMaximumStake = (): void => {
-  maximumStake = -1;
+  window.germesData.maximumStake = undefined;
 };
 
 export const updateMaximumStake = (): boolean => {
@@ -21,7 +19,7 @@ export const updateMaximumStake = (): boolean => {
     );
     if (maxErrorMatch) {
       log(`Обновлена максимальная ставка: "${maxErrorMatch[1]}"`, 'orange');
-      maximumStake = Number(maxErrorMatch[1]);
+      window.germesData.maximumStake = Number(maxErrorMatch[1]);
       return true;
     }
     const newMaxError = /^Your stake exceeds the maximum allowed$/.test(
@@ -33,7 +31,7 @@ export const updateMaximumStake = (): boolean => {
       );
       if (!newMaxStakeValueElement) {
         log('Есть ошибка о максе (новая), но нет самого макса', 'crimson');
-        maximumStake = 0;
+        window.germesData.maximumStake = 0;
         return true;
       }
       const newMaxStakeValueText = newMaxStakeValueElement.textContent.trim();
@@ -45,11 +43,11 @@ export const updateMaximumStake = (): boolean => {
           `Есть ошибка о максе (новая), но не понятен формат самого макса: "${newMaxStakeValueText}"`,
           'crimson'
         );
-        maximumStake = 0;
+        window.germesData.maximumStake = 0;
         return true;
       }
       log(`Обновлена максимальная ставка: "${newMaxErrorMatch[1]}"`, 'orange');
-      maximumStake = Number(newMaxErrorMatch[1]);
+      window.germesData.maximumStake = Number(newMaxErrorMatch[1]);
       return true;
     }
   }
@@ -57,8 +55,8 @@ export const updateMaximumStake = (): boolean => {
 };
 
 const getMaximumStake = (): number => {
-  if (maximumStake !== -1) {
-    return maximumStake;
+  if (window.germesData.maximumStake !== undefined) {
+    return window.germesData.maximumStake;
   }
   return getBalance();
 };

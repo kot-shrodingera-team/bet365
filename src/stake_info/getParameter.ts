@@ -3,8 +3,8 @@ import getSiteTeamNames from '../checkBet/getSiteTeamNames';
 import { formatParameterRegex, getHandicapScoreOffset } from '../checkBet/util';
 
 export const parseParameter = (parameter: string): number => {
-  const singleParameterRegex = /^[+-]?\d+\.\d+$/;
-  const doubleParameterRegex = /^([+-]?\d+\.\d+),([+-]?\d+\.\d+)$/;
+  const singleParameterRegex = /^[+-]?\d+(?:\.\d+)?$/;
+  const doubleParameterRegex = /^([+-]?\d+(?:\.\d+)?),([+-]?\d+(?:\.\d+)?)$/;
   const doubleParameterMatch = parameter.match(doubleParameterRegex);
   if (doubleParameterMatch) {
     const firstParameter = Number(doubleParameterMatch[1]);
@@ -18,22 +18,26 @@ export const parseParameter = (parameter: string): number => {
 };
 
 const getParameter = (): number => {
-  const marketNameElement = document.querySelector('.bss-NormalBetItem_Title');
+  const marketNameSelector = '.bss-NormalBetItem_Title';
+  const betNameSelector = '.bss-NormalBetItem_Title';
+
+  const marketNameElement = document.querySelector(marketNameSelector);
   if (!marketNameElement) {
     log('Не найден маркет ставки', 'crimson');
     return -9999;
   }
-  const marketName = marketNameElement.textContent.trim();
-  if (/^(Draw No Bet)$/i.test(marketName)) {
-    return 0;
-  }
-
-  const betNameElement = document.querySelector('.bss-NormalBetItem_Title');
+  const betNameElement = document.querySelector(betNameSelector);
   if (!betNameElement) {
     log('Не найдена роспись ставки', 'crimson');
     return -9999;
   }
+
+  const marketName = marketNameElement.textContent.trim();
   let betName = betNameElement.textContent.trim();
+
+  if (/^(Draw No Bet)$/i.test(marketName)) {
+    return 0;
+  }
 
   const betslipHandicapElement = document.querySelector(
     '.bss-NormalBetItem_Handicap'

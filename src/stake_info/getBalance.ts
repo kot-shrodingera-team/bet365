@@ -6,12 +6,30 @@ import {
 // Locator.user._balance.refreshBalance();
 // Locator.user._balance.totalBalance;
 
+export const balanceSelector = '.hm-Balance';
+// const balanceRegex = /(\d+(?:\.\d+)?)/;
+// const replaceDataArray = [
+//   {
+//     searchValue: '',
+//     replaceValue: '',
+//   },
+// ];
+// const removeRegex = /[\s,']/g;
+
 export const balanceReady = balanceReadyGenerator({
-  balanceSelector: '.hm-Balance',
+  balanceSelector,
+  // balanceRegex,
+  // replaceDataArray,
+  // removeRegex,
+  // context: () => document,
 });
 
 const getBalance = getBalanceGenerator({
-  balanceSelector: '.hm-Balance',
+  balanceSelector,
+  // balanceRegex,
+  // replaceDataArray,
+  // removeRegex,
+  // context: () => document,
 });
 
 export const updateBalance = (): void => {

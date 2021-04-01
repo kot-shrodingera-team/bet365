@@ -1,7 +1,21 @@
 import getCoefficientGenerator from '@kot-shrodingera-team/germes-generators/stake_info/getCoefficient';
 
+// const getCoefficientText = (): string => {
+//   return null;
+// };
+
 const getCoefficient = getCoefficientGenerator({
-  coefficientSelector: '.bss-NormalBetItem_OddsContainer',
+  coefficientSelector: '.bs-OddsLabel',
+  // getCoefficientText,
+  // replaceDataArray: [
+  //   {
+  //     searchValue: '',
+  //     replaceValue: '',
+  //   },
+  // ],
+  // removeRegex: /[\s,']/g,
+  // coefficientRegex: /(\d+(?:\.\d+)?)/,
+  // context: () => document,
 });
 
 export default getCoefficient;

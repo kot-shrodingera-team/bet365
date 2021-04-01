@@ -8,7 +8,6 @@ const changeToStandardBetslip = async (): Promise<boolean> => {
   if (!expandedBetslip) {
     return false;
   }
-  await getElement('.bss-NormalBetItem_FixtureDescription');
   return true;
 };
 

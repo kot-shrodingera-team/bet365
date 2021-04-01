@@ -1,15 +1,13 @@
 import { log, sleep } from '@kot-shrodingera-team/germes-utils';
 
 const findEventInOverview = async (): Promise<HTMLElement> => {
-  const scroller = document.querySelector(
-    '.ovm-OverviewScroller'
-  ) as HTMLElement;
+  const scroller = document.querySelector<HTMLElement>('.ovm-OverviewScroller');
   if (!scroller) {
     return null;
   }
-  const overviewContent = document.querySelector(
+  const overviewContent = document.querySelector<HTMLElement>(
     '.ovm-OverviewView_Content'
-  ) as HTMLElement;
+  );
   if (!overviewContent) {
     return null;
   }
@@ -19,9 +17,9 @@ const findEventInOverview = async (): Promise<HTMLElement> => {
     scroller.scrollTop !==
     overviewContent.offsetHeight - scroller.offsetHeight
   ) {
-    const newMatches = ([
-      ...document.querySelectorAll('.ovm-Fixture'),
-    ] as HTMLElement[]).filter((matchElement) => {
+    const newMatches = [
+      ...document.querySelectorAll<HTMLElement>('.ovm-Fixture'),
+    ].filter((matchElement) => {
       return !matches.includes(matchElement);
     });
     scroller.scrollTo(0, overviewContent.offsetHeight - scroller.offsetHeight);

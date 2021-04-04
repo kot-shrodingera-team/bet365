@@ -15,7 +15,7 @@ export const enum CouponError {
 const accountRestrictedRegex = /Certain restrictions may be applied to your account. If you have an account balance you can request to withdraw these funds now by going to the Withdrawal page in Members./i;
 const accountStep2Regex = /In accordance with licensing conditions we are required to verify your age and identity. Certain restrictions may be applied to your account until we are able to verify your details. Please go to the Know Your Customer page in Members and provide the requested information./i;
 const accountSurveyRegex = /As part of the ongoing management of your account we need you to answer a set of questions relating to Responsible Gambling. Certain restrictions may be applied to your account until you have successfully completed this. You can answer these questions now by going to the Self-Assessment page in Members./i;
-const oddsChangedRegex = /The line, odds or availability of your selections has changed./i;
+const oddsChangedRegex = /The line, odds or availability of your selections has changed.|The line, odds or availability of selections on your betslip has changed. Please review your betslip/i;
 
 const newMaximumErrorRegex = /^Stake\/risk entered on selection .* is above the available maximum of .*?(\d+\.\d+)\.$/i;
 const newMaximumShortErrorRegex = /^Max Stake .*?(\d+\.\d+)$/i;

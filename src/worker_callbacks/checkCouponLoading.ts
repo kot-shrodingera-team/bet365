@@ -40,7 +40,7 @@ const asyncCheck = async () => {
   };
   const errorInform = (informedMessage: string, botMessage?: string) => {
     worker.Helper.SendInformedMessage(
-      `В ${bookmakerName} произошла ошибка принятия ставки:\n${informedMessage}` +
+      `В ${bookmakerName} произошла ошибка принятия ставки:\n${informedMessage}\n` +
         `Бот засчитал ставку как не принятую\n` +
         `${stakeInfoString()}`
     );

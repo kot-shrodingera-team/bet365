@@ -208,6 +208,12 @@ const asyncCheck = async () => {
       return error();
     }
     if (couponError === CouponError.OddsChanged) {
+      const suspendedStake = document.querySelector(
+        '.bss-NormalBetItem.bss-NormalBetItem_Suspended'
+      );
+      if (suspendedStake) {
+        return error('Ставка недоступна');
+      }
       if (!acceptButton) {
         log('Не найдена кнопка принятия изменений', 'crimson');
       } else {

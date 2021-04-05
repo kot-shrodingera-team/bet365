@@ -29,6 +29,13 @@ const preCheck = (): boolean => {
     return false;
   }
   if (couponError === CouponError.OddsChanged) {
+    const suspendedStake = document.querySelector(
+      '.bss-NormalBetItem.bss-NormalBetItem_Suspended'
+    );
+    if (suspendedStake) {
+      log('Ставка недоступна', 'crimson');
+      return false;
+    }
     if (!acceptButton) {
       log('Не найдена кнопка принятия изменений', 'crimson');
       return false;

@@ -1,5 +1,4 @@
 import getStakeInfoGenerator from '@kot-shrodingera-team/germes-generators/worker_callbacks/getStakeInfo';
-import { log } from '@kot-shrodingera-team/germes-utils';
 import checkAuth from '../stake_info/checkAuth';
 import getStakeCount from '../stake_info/getStakeCount';
 import getBalance from '../stake_info/getBalance';

@@ -27,6 +27,9 @@ const getCouponError = (): CouponError => {
     return CouponError.NoError;
   }
   const betErrorMessage = errorMessageElement.textContent.trim();
+  if (!betErrorMessage) {
+    return CouponError.NoError;
+  }
 
   if (accountRestrictedRegex.test(betErrorMessage)) {
     return CouponError.AccountRestricted;

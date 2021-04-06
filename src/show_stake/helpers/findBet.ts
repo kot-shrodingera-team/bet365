@@ -6,12 +6,12 @@ const findBet = (
   betParameter: string
 ): HTMLElement => {
   const marketBets = [
-    ...document.querySelectorAll(
+    ...document.querySelectorAll<HTMLElement>(
       `#allBetsTable[data-gameid="${gameId}"] > .bet_group_col span[data-type="${Number(
         marketId
       )}"]`
     ),
-  ] as HTMLElement[];
+  ];
   if (marketBets.length === 0) {
     log('Не найдены ставки по нужному маркету', 'red');
     return null;

@@ -1,7 +1,7 @@
 import { getElement, log } from '@kot-shrodingera-team/germes-utils';
 
 export const checkCashOutEnabled = async (timeout = 5000): Promise<number> => {
-  window.location.href = new URL('/#/MB/', window.location.origin).href;
+  window.location.hash = '#/MB/';
   await getElement('.myb-MyBetsHeader_Button', timeout);
   const myBetsFilterButtons = [
     ...document.querySelectorAll('.myb-MyBetsHeader_Button'),
@@ -11,7 +11,7 @@ export const checkCashOutEnabled = async (timeout = 5000): Promise<number> => {
       'Ошибка проверки порезки аккаунта: не найдены кнопки фильтров истории ставок',
       'crimson'
     );
-    window.location.href = new URL('/#/IP/', window.location.origin).href;
+    window.location.hash = '#/IP/';
     return 0;
   }
   const cashOutFilterButton = myBetsFilterButtons.find(
@@ -22,48 +22,48 @@ export const checkCashOutEnabled = async (timeout = 5000): Promise<number> => {
       'Ошибка проверки порезки аккаунта: не найдена кнопка фильтра Cash Out',
       'crimson'
     );
-    window.location.href = new URL('/#/IP/', window.location.origin).href;
+    window.location.hash = '#/IP/';
     return 0;
   }
   const cashOutEnabled = ![...cashOutFilterButton.classList].includes('Hidden');
-  window.location.href = new URL('/#/IP/', window.location.origin).href;
+  window.location.hash = '#/IP/';
   return cashOutEnabled ? 1 : -1;
 };
 
-export const checkRestriction = (): boolean => {
-  const betErrorMessageElement = document.querySelector(
-    '.bss-Footer_MessageBody'
-  );
-  if (betErrorMessageElement) {
-    const betErrorMessage = betErrorMessageElement.textContent.trim();
-    const restrictedAccountMessage =
-      'Certain restrictions may be applied to your account. ' +
-      'If you have an account balance you can request to withdraw these funds now by going to the Withdrawal page in Members.';
-    if (betErrorMessage === restrictedAccountMessage) {
-      return true;
-    }
-  }
-  return false;
+export const accountRestricted = (): void => {
+  worker.SetSessionData('Bet365.AccountRestricted', '1');
+  const message = worker.SetBookmakerPaused(true)
+    ? 'Аккаунт Bet365 заблокирован! Bet365 поставлен на паузу'
+    : 'Аккаунт Bet365 заблокирован! Bet365 НЕ поставлен на паузу. Поставьте на паузу вручную';
+  log(message, 'red');
+  worker.Helper.SendInformedMessage(message);
 };
 
-export const accountBlocked = (): void => {
-  if (worker.SetSessionData) {
-    worker.SetSessionData('Bet365 Blocked', '1');
-  }
-  const message =
-    worker.SetBookmakerPaused && worker.SetBookmakerPaused(true)
-      ? 'Аккаунт Bet365 заблокирован! Bet365 поставлен на паузу'
-      : 'Аккаунт Bet365 заблокирован! Bet365 НЕ поставлен на паузу. Поставьте на паузу вручную';
+export const accountStep2 = (): void => {
+  worker.SetSessionData('Bet365.AccountStep2', '1');
+  const message = worker.SetBookmakerPaused(true)
+    ? 'В Bet365 не пройден Step 2, ставки заблокированы! Bet365 поставлен на паузу'
+    : 'В Bet365 не пройден Step 2, ставки заблокированы! Поставьте на паузу вручную';
+  log(message, 'red');
+  worker.Helper.SendInformedMessage(message);
+};
+
+export const accountSurvey = (): void => {
+  worker.SetSessionData('Bet365.AccountSurvey', '1');
+  const message = worker.SetBookmakerPaused(true)
+    ? 'В Bet365 не пройден опрос, ставки заблокированы! Bet365 поставлен на паузу'
+    : 'В Bet365 не пройден опрос, ставки заблокированы! Поставьте на паузу вручную';
   log(message, 'red');
   worker.Helper.SendInformedMessage(message);
 };
 
 export const accountLimited = (): void => {
+  worker.SetSessionData('Bet365.AccountLimited', '1');
   const message = (() => {
     let text = 'В Bet365 порезанный аккаунт (отсутствует Cash Out)';
     if (worker.PauseOnLimitedAccount) {
       text += '. В настройках включена опция паузы при порезанном аккаунте';
-      if (worker.SetBookmakerPaused && worker.SetBookmakerPaused(true)) {
+      if (worker.SetBookmakerPaused(true)) {
         text += '. БК успешно поставлена на паузу';
       } else {
         text +=
@@ -75,12 +75,9 @@ export const accountLimited = (): void => {
     }
     return text;
   })();
-  if (
-    worker.GetSessionData &&
-    worker.GetSessionData('Bet365 LimitedAccountInformed') !== '1'
-  ) {
+  if (worker.GetSessionData('Bet365.AccountLimited.Informed') !== '1') {
     worker.Helper.SendInformedMessage(message);
-    worker.SetSessionData('Bet365 LimitedAccountInformed', '1');
+    worker.SetSessionData('Bet365.AccountLimited.Informed', '1');
     log(message, 'crimson');
   } else {
     log(message, 'orange');

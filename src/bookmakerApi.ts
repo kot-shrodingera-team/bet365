@@ -38,8 +38,16 @@ declare global {
   const ns_favouriteslib_ui: unknown;
   interface Window {
     germesData: {
+      doStakeTime: Date;
+      betProcessingStep: string;
+      betProcessingAdditionalInfo: string;
+
+      maximumStake: number;
       acceptChangesDelayStart: Date;
-      test: any;
+      referredBetData: {
+        placeNowValue: number;
+        referredValue: number;
+      };
     };
   }
 }

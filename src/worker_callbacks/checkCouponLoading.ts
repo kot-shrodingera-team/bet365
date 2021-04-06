@@ -82,17 +82,23 @@ const asyncCheck = async () => {
 
   const loaderSelector = '.bss-ProcessingButton';
   const referBetSelector = '.bss-ReferBetConfirmation';
-  const errorSelector = '.bss-Footer_MessageBody';
+  // const errorSelector = '.bss-Footer_MessageBody';
   const placeBetErrorSelector = '.bs-PlaceBetErrorMessage_Contents';
   const acceptButtonSelector = '.bs-AcceptButton';
   const receiptTickSelector = '.bss-ReceiptContent_Tick';
 
+  const errorAwaiter = () =>
+    awaiter(
+      () => getCouponError() !== CouponError.NoError,
+      getRemainingTimeout()
+    );
+
   window.germesData.betProcessingStep = 'waitingForLoaderOrResult';
 
-  await Promise.any([
+  await Promise.race([
     getElement(loaderSelector, getRemainingTimeout()),
     getElement(referBetSelector, getRemainingTimeout()),
-    getElement(errorSelector, getRemainingTimeout()),
+    errorAwaiter(),
     getElement(placeBetErrorSelector, getRemainingTimeout()),
     getElement(acceptButtonSelector, getRemainingTimeout()),
     getElement(receiptTickSelector, getRemainingTimeout()),
@@ -117,9 +123,9 @@ const asyncCheck = async () => {
     });
 
     window.germesData.betProcessingStep = 'waitingForResult';
-    await Promise.any([
+    await Promise.race([
       getElement(referBetSelector, getRemainingTimeout()),
-      getElement(errorSelector, getRemainingTimeout()),
+      errorAwaiter(),
       getElement(placeBetErrorSelector, getRemainingTimeout()),
       getElement(acceptButtonSelector, getRemainingTimeout()),
       getElement(receiptTickSelector, getRemainingTimeout()),
@@ -182,17 +188,16 @@ const asyncCheck = async () => {
     placeBetAndReferButton.click();
     log('Нажимаем на кнопку "Place Bet and Refer"', 'orange');
 
-    await Promise.any([
-      getElement(errorSelector, getRemainingTimeout()),
+    await Promise.race([
+      errorAwaiter(),
       getElement(placeBetErrorSelector, getRemainingTimeout()),
       getElement(acceptButtonSelector, getRemainingTimeout()),
       getElement(receiptTickSelector, getRemainingTimeout()),
     ]);
   }
 
-  const errorElement = document.querySelector(errorSelector);
-  if (errorElement) {
-    const couponError = getCouponError();
+  const couponError = getCouponError();
+  if (couponError !== CouponError.NoError) {
     const acceptButton = document.querySelector<HTMLElement>(
       '.bs-AcceptButton'
     );
@@ -252,7 +257,7 @@ const asyncCheck = async () => {
         'В купоне неизвестная ошибка'
       );
     }
-    return errorInform('В купоне неизвестная ошибка');
+    return errorInform('В купоне неизвестный тип ошибки');
   }
 
   const placeBetErrorElement = document.querySelector(placeBetErrorSelector);

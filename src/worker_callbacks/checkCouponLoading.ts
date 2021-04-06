@@ -6,6 +6,7 @@ import {
   stakeInfoString,
   sleep,
 } from '@kot-shrodingera-team/germes-utils';
+import { JsFailError } from '@kot-shrodingera-team/germes-utils/errors';
 import {
   accountRestricted,
   accountStep2,
@@ -17,6 +18,7 @@ import getCouponError, {
   getCouponErrorText,
   updateMaximumStake,
 } from '../show_stake/helpers/getCouponError';
+import openBet from '../show_stake/openBet';
 // import openBet from '../show_stake/openBet';
 import { getDoStakeTime } from '../stake_info/doStakeTime';
 
@@ -57,26 +59,26 @@ const asyncCheck = async () => {
     }
     window.germesData.betProcessingStep = 'success';
   };
-  // const reopen = async (message?: string) => {
-  //   if (message !== undefined) {
-  //     log(message, 'crimson');
-  //   }
-  //   window.germesData.betProcessingStep = 'reopen';
-  //   log('Переоткрываем купон', 'orange');
-  //   try {
-  //     await openBet();
-  //     log('Ставка успешно переоткрыта', 'green');
-  //     window.germesData.betProcessingStep = 'reopened';
-  //   } catch (reopenError) {
-  //     if (reopenError instanceof JsFailError) {
-  //       log(reopenError.message, 'red');
-  //       window.germesData.betProcessingStep = 'error';
-  //     } else {
-  //       log(reopenError.message, 'red');
-  //       window.germesData.betProcessingStep = 'error';
-  //     }
-  //   }
-  // };
+  const reopen = async (message?: string) => {
+    if (message !== undefined) {
+      log(message, 'crimson');
+    }
+    window.germesData.betProcessingStep = 'reopen';
+    log('Переоткрываем купон', 'orange');
+    try {
+      await openBet();
+      log('Ставка успешно переоткрыта', 'green');
+      window.germesData.betProcessingStep = 'reopened';
+    } catch (reopenError) {
+      if (reopenError instanceof JsFailError) {
+        log(reopenError.message, 'red');
+        window.germesData.betProcessingStep = 'error';
+      } else {
+        log(reopenError.message, 'red');
+        window.germesData.betProcessingStep = 'error';
+      }
+    }
+  };
 
   const loaderSelector = '.bss-ProcessingButton';
   const referBetSelector = '.bss-ReferBetConfirmation';
@@ -259,14 +261,13 @@ const asyncCheck = async () => {
 
     const checkMyBetsRegex = /Please check My Bets for confirmation that your bet has been successfully placed./i;
     if (checkMyBetsRegex.test(placeBetErrorText)) {
-      log('Обработка ставки завершена (check My Bets)', 'orange');
       const message =
-        `В Bet365 появилось окно о необходимости проверки принятия ставки в "My Bets":\n${placeBetErrorText}` +
-        `Бот засчитал ставку как проставленную\n` +
-        `${stakeInfoString()}\n` +
-        `Пожалуйста, проверьте самостоятельно. Если всё плохо - пишите в ТП`;
+        `В Bet365 появилось окно о необходимости проверки принятия ставки в "My Bets":\n` +
+        `${placeBetErrorText}\n` +
+        `Бот засчитал ставку как не принятую\n` +
+        `${stakeInfoString()}`;
       worker.Helper.SendInformedMessage(message);
-      return success('Ставка возможно принята (Check My Bets)');
+      return reopen('Check My Bets');
     }
     log('В купоне неизвестная ошибка', 'crimson');
     log(placeBetErrorText, 'tomato');

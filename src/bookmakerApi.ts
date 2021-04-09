@@ -18,6 +18,7 @@ interface Locator {
     _balance: {
       refreshBalance: () => void;
       totalBalance: string;
+      bonusBalance: string;
     };
   };
   betSlipManager: {
@@ -36,20 +37,31 @@ declare global {
   const Locator: Locator;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const ns_favouriteslib_ui: unknown;
-  interface Window {
-    germesData: {
-      doStakeTime: Date;
-      betProcessingStep: string;
-      betProcessingAdditionalInfo: string;
-
-      maximumStake: number;
-      acceptChangesDelayStart: Date;
-      referredBetData: {
-        placeNowValue: number;
-        referredValue: number;
-      };
+  // interface Window {
+  //   germesData: Bet365GermesData;
+  // }
+  interface GermesData {
+    maximumStake: number;
+    acceptChangesDelayStart: Date;
+    referredBetData: {
+      placeNowValue: number;
+      referredValue: number;
     };
   }
 }
+
+export const clearGermesData = (): void => {
+  window.germesData = {
+    bookmakerName: 'Bet365',
+    betProcessingStep: undefined,
+    betProcessingAdditionalInfo: undefined,
+    betProcessingTimeout: 50000,
+    doStakeTime: undefined,
+
+    maximumStake: undefined,
+    acceptChangesDelayStart: undefined,
+    referredBetData: undefined,
+  };
+};
 
 export default {};

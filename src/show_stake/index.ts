@@ -1,22 +1,31 @@
-import { log } from '@kot-shrodingera-team/germes-utils';
+import { getWorkerParameter, log } from '@kot-shrodingera-team/germes-utils';
 import {
   JsFailError,
   NewUrlError,
 } from '@kot-shrodingera-team/germes-utils/errors';
+import { clearGermesData } from '../bookmakerApi';
 import openBet from './openBet';
 import openEvent from './openEvent';
-import preCheck from './preCheck';
+import preOpenBet from './preOpenBet';
+import preOpenEvent from './preOpenEvent';
 import setBetAcceptMode from './setBetAcceptMode';
 
 const showStake = async (): Promise<void> => {
+  if (getWorkerParameter('fakeOpenStake')) {
+    log('[fake] Ставка открыта', 'green');
+    worker.JSStop();
+    return;
+  }
   localStorage.setItem('couponOpening', '1');
+  clearGermesData();
   try {
     log(
       `Открываем ставку:\n${worker.TeamOne} vs ${worker.TeamTwo}\n${worker.BetName}`,
       'steelblue'
     );
-    await preCheck();
+    await preOpenEvent();
     await openEvent();
+    await preOpenBet();
     await openBet();
     await setBetAcceptMode();
     log('Ставка успешно открыта', 'green');
@@ -36,10 +45,9 @@ const showStake = async (): Promise<void> => {
         'red'
       );
       log(error.message, 'red');
-      // eslint-disable-next-line no-console
-      console.trace();
       localStorage.setItem('couponOpening', '0');
       worker.JSFail();
+      throw error;
     }
   }
 };

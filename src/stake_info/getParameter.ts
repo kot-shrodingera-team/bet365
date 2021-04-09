@@ -1,6 +1,13 @@
-import { log, ri } from '@kot-shrodingera-team/germes-utils';
-import getSiteTeamNames from '../checkBet/getSiteTeamNames';
-import { formatParameterRegex, getHandicapScoreOffset } from '../checkBet/util';
+import {
+  getWorkerParameter,
+  log,
+  ri,
+} from '@kot-shrodingera-team/germes-utils';
+import getSiteTeamNames from '../show_stake/helpers/checkBet/getSiteTeamNames';
+import {
+  formatParameterRegex,
+  getHandicapScoreOffset,
+} from '../show_stake/helpers/checkBet/util';
 
 export const parseParameter = (parameter: string): number => {
   const singleParameterRegex = /^[+-]?\d+(?:\.\d+)?$/;
@@ -18,15 +25,27 @@ export const parseParameter = (parameter: string): number => {
 };
 
 const getParameter = (): number => {
+  if (
+    getWorkerParameter('fakeParameter') ||
+    getWorkerParameter('fakeOpenStake')
+  ) {
+    const parameter = Number(JSON.parse(worker.ForkObj).param);
+    if (Number.isNaN(parameter)) {
+      return -6666;
+    }
+    return parameter;
+  }
+
   const marketNameSelector = '.bss-NormalBetItem_Title';
   const betNameSelector = '.bss-NormalBetItem_Title';
 
   const marketNameElement = document.querySelector(marketNameSelector);
+  const betNameElement = document.querySelector(betNameSelector);
+
   if (!marketNameElement) {
     log('Не найден маркет ставки', 'crimson');
     return -9999;
   }
-  const betNameElement = document.querySelector(betNameSelector);
   if (!betNameElement) {
     log('Не найдена роспись ставки', 'crimson');
     return -9999;

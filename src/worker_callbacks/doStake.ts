@@ -1,24 +1,29 @@
 import doStakeGenerator from '@kot-shrodingera-team/germes-generators/worker_callbacks/doStake';
-import { log } from '@kot-shrodingera-team/germes-utils';
+import { getWorkerParameter, log } from '@kot-shrodingera-team/germes-utils';
 import getCoefficient from '../stake_info/getCoefficient';
-import { clearDoStakeTime } from '../stake_info/doStakeTime';
 
 const preCheck = (): boolean => {
   const betslipBetCreditsCheckbox = document.querySelector<HTMLElement>(
     '.bsc-BetCreditsHeader_CheckBox'
   );
+  // .bsc-BetCreditsHeader_CheckBox.bsc-BetCreditsHeader_CheckBox-selected
+  // .bsc-BetCreditsHeader_CheckBox
   if (betslipBetCreditsCheckbox) {
-    if (betslipBetCreditsCheckbox.childElementCount) {
-      if (
-        ![...betslipBetCreditsCheckbox.classList].includes(
-          'bsc-BetCreditsHeader_CheckBox-selected'
-        )
-      ) {
+    const betCreditsSelected = [
+      ...betslipBetCreditsCheckbox.classList,
+    ].includes('bsc-BetCreditsHeader_CheckBox-selected');
+    if (getWorkerParameter('useBetBonuses')) {
+      if (betCreditsSelected) {
+        log('Используются бонусы', 'steelblue');
+      } else {
         log('Включаем использование бонусов', 'orange');
         betslipBetCreditsCheckbox.click();
-      } else {
-        log('Используются бонусы', 'orange');
       }
+    } else if (betCreditsSelected) {
+      log('Отключаем использование бонусов', 'orange');
+      betslipBetCreditsCheckbox.click();
+    } else {
+      log('Бонусы не используются', 'steelblue');
     }
   }
 
@@ -30,10 +35,9 @@ const preCheck = (): boolean => {
   return true;
 };
 
-const postCheck = (): boolean => {
-  window.germesData.betProcessingStep = 'beforeStart';
-  return true;
-};
+// const postCheck = (): boolean => {
+//   return true;
+// };
 
 const doStake = doStakeGenerator({
   preCheck,
@@ -46,8 +50,7 @@ const doStake = doStakeGenerator({
   // ],
   // disabledCheck: false,
   getCoefficient,
-  postCheck,
-  clearDoStakeTime,
+  // postCheck,
   // context: () => document,
 });
 

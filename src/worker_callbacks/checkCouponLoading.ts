@@ -5,13 +5,15 @@ import {
   awaiter,
   stakeInfoString,
   sleep,
+  getRemainingTimeout,
+  checkCouponLoadingError,
+  checkCouponLoadingSuccess,
 } from '@kot-shrodingera-team/germes-utils';
-import { JsFailError } from '@kot-shrodingera-team/germes-utils/errors';
 import {
   accountRestricted,
   accountStep2,
   accountSurvey,
-} from '../initialization/accountChecks';
+} from '../show_stake/helpers/accountChecks';
 // import { JsFailError } from '@kot-shrodingera-team/germes-utils/errors';
 import getCouponError, {
   CouponError,
@@ -19,67 +21,8 @@ import getCouponError, {
   updateMaximumStake,
 } from '../show_stake/helpers/getCouponError';
 import openBet from '../show_stake/openBet';
-// import openBet from '../show_stake/openBet';
-import { getDoStakeTime } from '../stake_info/doStakeTime';
-
-const bookmakerName = 'Bet365';
-
-const timeout = 50000;
-const getRemainingTimeout = (maximum?: number) => {
-  const result = timeout - (new Date().getTime() - getDoStakeTime().getTime());
-  if (maximum !== undefined && timeout > maximum) {
-    return maximum;
-  }
-  return result;
-};
 
 const asyncCheck = async () => {
-  const error = (message?: string) => {
-    if (message !== undefined) {
-      log(message, 'crimson');
-    }
-    window.germesData.betProcessingStep = 'error';
-  };
-  const errorInform = (informedMessage: string, botMessage?: string) => {
-    worker.Helper.SendInformedMessage(
-      `В ${bookmakerName} произошла ошибка принятия ставки:\n${informedMessage}\n` +
-        `Бот засчитал ставку как не принятую\n` +
-        `${stakeInfoString()}`
-    );
-    if (botMessage) {
-      log(botMessage, 'crimson');
-    } else {
-      log(informedMessage, 'crimson');
-    }
-    window.germesData.betProcessingStep = 'error';
-  };
-  const success = (message?: string) => {
-    if (message !== undefined) {
-      log(message, 'steelblue');
-    }
-    window.germesData.betProcessingStep = 'success';
-  };
-  const reopen = async (message?: string) => {
-    if (message !== undefined) {
-      log(message, 'crimson');
-    }
-    window.germesData.betProcessingStep = 'reopen';
-    log('Переоткрываем купон', 'orange');
-    try {
-      await openBet();
-      log('Ставка успешно переоткрыта', 'green');
-      window.germesData.betProcessingStep = 'reopened';
-    } catch (reopenError) {
-      if (reopenError instanceof JsFailError) {
-        log(reopenError.message, 'red');
-        window.germesData.betProcessingStep = 'error';
-      } else {
-        log(reopenError.message, 'red');
-        window.germesData.betProcessingStep = 'error';
-      }
-    }
-  };
-
   const loaderSelector = '.bss-ProcessingButton';
   const referBetSelector = '.bss-ReferBetConfirmation';
   // const errorSelector = '.bss-Footer_MessageBody';
@@ -158,9 +101,12 @@ const asyncCheck = async () => {
       !referredValueElement ||
       !placeBetAndReferButton
     ) {
-      return errorInform(
-        'Не дождались результата принятия ставки при Refer Bet Confirmation'
-      );
+      return checkCouponLoadingError({
+        botMessage:
+          'Не дождались результата принятия ставки при Refer Bet Confirmation',
+        informMessage:
+          'Не дождались результата принятия ставки при Refer Bet Confirmation',
+      });
     }
 
     const placeNowValueText = placeNowValueElement.textContent.trim();
@@ -168,15 +114,17 @@ const asyncCheck = async () => {
     const valueRegex = /(\d+(?:\.\d+)?)/;
     const placeNowValueMatch = placeNowValueText.match(valueRegex);
     if (!placeNowValueMatch) {
-      return errorInform(
-        `Не удалось определить значение placeNow: ${placeNowValueText}`
-      );
+      return checkCouponLoadingError({
+        botMessage: `Не удалось определить значение Place Now: ${placeNowValueText}`,
+        informMessage: `Не удалось определить значение Place Now: ${placeNowValueText}`,
+      });
     }
     const referredValueMatch = referredValueText.match(valueRegex);
     if (!referredValueMatch) {
-      return errorInform(
-        `Не удалось определить значение placeNow: ${referredValueText}`
-      );
+      return checkCouponLoadingError({
+        botMessage: `Не удалось определить значение Referred: ${referredValueText}`,
+        informMessage: `Не удалось определить значение Referred: ${referredValueText}`,
+      });
     }
     window.germesData.referredBetData.placeNowValue = Number(
       placeNowValueMatch[1]
@@ -204,22 +152,24 @@ const asyncCheck = async () => {
 
     if (couponError === CouponError.AccountRestricted) {
       accountRestricted();
-      return error();
+      return checkCouponLoadingError({});
     }
     if (couponError === CouponError.AccountStep2) {
       accountStep2();
-      return error();
+      return checkCouponLoadingError({});
     }
     if (couponError === CouponError.AccounSurvey) {
       accountSurvey();
-      return error();
+      return checkCouponLoadingError({});
     }
     if (couponError === CouponError.OddsChanged) {
       const suspendedStake = document.querySelector(
         '.bss-NormalBetItem.bss-NormalBetItem_Suspended'
       );
       if (suspendedStake) {
-        return error('Ставка недоступна');
+        return checkCouponLoadingError({
+          botMessage: 'Ставка недоступна',
+        });
       }
       if (!acceptButton) {
         log('Не найдена кнопка принятия изменений', 'crimson');
@@ -227,7 +177,9 @@ const asyncCheck = async () => {
         log('Принимаем изменения', 'orange');
         acceptButton.click();
       }
-      return error('Изменение котировок');
+      return checkCouponLoadingError({
+        botMessage: 'Изменение котировок',
+      });
     }
     if (
       couponError === CouponError.NewMaximum ||
@@ -247,17 +199,21 @@ const asyncCheck = async () => {
         log('Задержка после появления максимума');
         await sleep(delay);
       }
-      return error('Превышена максимальная ставка');
+      return checkCouponLoadingError({
+        botMessage: 'Превышена максимальная ставка',
+      });
     }
     if (couponError === CouponError.Unknown) {
       const couponErrorText = getCouponErrorText();
       log(couponErrorText, 'tomato');
-      return errorInform(
-        `В купоне неизвестная ошибка:\n${couponErrorText}`,
-        'В купоне неизвестная ошибка'
-      );
+      return checkCouponLoadingError({
+        informMessage: couponErrorText,
+      });
     }
-    return errorInform('В купоне неизвестный тип ошибки');
+    return checkCouponLoadingError({
+      botMessage: 'В купоне неизвестный тип ошибки',
+      informMessage: 'В купоне неизвестный тип ошибки',
+    });
   }
 
   const placeBetErrorElement = document.querySelector(placeBetErrorSelector);
@@ -266,22 +222,31 @@ const asyncCheck = async () => {
 
     const checkMyBetsRegex = /Please check My Bets for confirmation that your bet has been successfully placed./i;
     if (checkMyBetsRegex.test(placeBetErrorText)) {
-      const message =
-        `В Bet365 появилось окно о необходимости проверки принятия ставки в "My Bets":\n` +
-        `${placeBetErrorText}\n` +
-        `Бот засчитал ставку как не принятую\n` +
-        `${stakeInfoString()}`;
-      worker.Helper.SendInformedMessage(message);
-      return reopen('Check My Bets');
+      return checkCouponLoadingError({
+        botMessage: 'Check My Bets',
+        informMessage: placeBetErrorText,
+        reopen: {
+          openBet,
+        },
+      });
     }
     log('В купоне неизвестная ошибка', 'crimson');
     log(placeBetErrorText, 'tomato');
-    return errorInform(placeBetErrorText, 'В купоне ошибка ставки');
+    return checkCouponLoadingError({
+      botMessage: 'В купоне ошибка ставки',
+      informMessage: placeBetErrorText,
+      reopen: {
+        openBet,
+      },
+    });
   }
 
   const acceptButtonElement = document.querySelector(acceptButtonSelector);
   if (acceptButtonElement) {
-    return errorInform('Появилась кнопка принятия изменений, но нет сообщения');
+    return checkCouponLoadingError({
+      botMessage: 'Появилась кнопка принятия изменений, но нет сообщения',
+      informMessage: 'Появилась кнопка принятия изменений, но нет сообщения',
+    });
   }
 
   const receiptTickElement = document.querySelector(receiptTickSelector);
@@ -309,10 +274,13 @@ const asyncCheck = async () => {
         worker.Helper.SendInformedMessage(message);
       }
     }
-    return success('Появилась иконка успешной ставки');
+    return checkCouponLoadingSuccess('Появилась иконка успешной ставки');
   }
 
-  return errorInform('Не дождались результата принятия ставки');
+  return checkCouponLoadingError({
+    botMessage: 'Не дождались результата принятия ставки',
+    informMessage: 'Не дождались результата принятия ставки',
+  });
 };
 
 const check = () => {
@@ -336,9 +304,6 @@ const check = () => {
 };
 
 const checkCouponLoading = checkCouponLoadingGenerator({
-  getDoStakeTime,
-  bookmakerName,
-  timeout,
   check,
 });
 

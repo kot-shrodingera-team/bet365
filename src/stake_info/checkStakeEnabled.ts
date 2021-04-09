@@ -4,7 +4,7 @@ import {
   accountRestricted,
   accountStep2,
   accountSurvey,
-} from '../initialization/accountChecks';
+} from '../show_stake/helpers/accountChecks';
 import getCouponError, {
   CouponError,
   getCouponErrorText,

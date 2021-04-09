@@ -9,10 +9,10 @@ import getMinimumStake from '../stake_info/getMinimumStake';
 import getMaximumStake from '../stake_info/getMaximumStake';
 import getCurrentSum from '../stake_info/getCurrentSum';
 
-const preAction = (): void => {};
+// const preAction = (): void => {};
 
 const getStakeInfo = getStakeInfoGenerator({
-  preAction,
+  // preAction,
   checkAuth,
   getStakeCount,
   getBalance,

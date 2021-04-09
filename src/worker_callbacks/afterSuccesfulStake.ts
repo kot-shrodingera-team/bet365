@@ -27,6 +27,9 @@ import getCoefficient from '../stake_info/getCoefficient';
 const getResultCoefficient = getCoefficient;
 
 const afterSuccesfulStake = (): void => {
+  if (getWorkerParameter('fakeDoStake')) {
+    return;
+  }
   log('Обновление итогового коэффициента', 'steelblue');
   const resultCoefficient = getResultCoefficient();
   if (resultCoefficient && resultCoefficient !== worker.StakeInfo.Coef) {

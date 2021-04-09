@@ -9,53 +9,17 @@ import {
   JsFailError,
   NewUrlError,
 } from '@kot-shrodingera-team/germes-utils/errors';
-import {
-  accountLimited,
-  checkCashOutEnabled,
-} from '../initialization/accountChecks';
-import checkCurrentLanguage from '../initialization/checkCurrentLanguage';
+import { accountLimited, checkCashOutEnabled } from './helpers/accountChecks';
 import checkAuth, { authStateReady } from '../stake_info/checkAuth';
 import { balanceReady, updateBalance } from '../stake_info/getBalance';
 import clearCoupon from './clearCoupon';
+import checkCurrentLanguage from './helpers/checkCurrentLanguage';
 
 const preCheck = async (): Promise<void> => {
   if (!checkBookerHost()) {
     log('Открыта не страница конторы (или зеркала)', 'crimson');
     window.location.href = new URL(worker.BookmakerMainUrl).href;
     throw new NewUrlError('Открываем страницу БК');
-  }
-
-  if (worker.GetSessionData('Bet365.AccountRestricted') === '1') {
-    const message = worker.SetBookmakerPaused(true)
-      ? 'Аккаунт Bet365 заблокирован! Bet365 поставлен на паузу'
-      : 'Аккаунт Bet365 заблокирован! Bet365 НЕ поставлен на паузу. Поставьте на паузу вручную';
-    worker.Helper.SendInformedMessage(message);
-    throw new JsFailError(message);
-  }
-
-  if (
-    /^(www\.)?bet365.ru$/.test(window.location.hostname) &&
-    worker.Currency !== 'RUR'
-  ) {
-    throw new JsFailError(
-      `Открыта RU версия сайта, но валюта не рубли (${worker.Currency}). Поменяйте валюту в настройках БК`
-    );
-  }
-  if (
-    !/^(www\.)?bet365.ru$/.test(new URL(worker.BookmakerMainUrl).hostname) &&
-    worker.Currency === 'RUR'
-  ) {
-    throw new JsFailError(
-      'Валюта рубли, но зеркало не bet365.ru. Поменяйте зеркало в настройках БК'
-    );
-  }
-
-  if (getWorkerParameter('reloadBeforeOpenBet')) {
-    if (localStorage.getItem('reloadedBeforeOpenBet') === '0') {
-      localStorage.setItem('reloadedBeforeOpenBet', '1');
-      window.location.reload();
-      throw new NewUrlError('Перезагружаем страницу перед открытием ставки');
-    }
   }
 
   const locatorLoaded = await awaiter(
@@ -81,22 +45,24 @@ const preCheck = async (): Promise<void> => {
   await balanceReady();
   updateBalance();
 
-  const currentLanguageCheck = await checkCurrentLanguage();
-  if (currentLanguageCheck === 0) {
-    throw new JsFailError('Проверка языка не прошла');
-  }
-  if (currentLanguageCheck === -1) {
-    throw new NewUrlError('Переключаем язык на английский');
-  }
-  log('Проверка языка прошла', 'steelblue');
+  if (!getWorkerParameter('fakeAuth')) {
+    const currentLanguageCheck = await checkCurrentLanguage();
+    if (currentLanguageCheck === 0) {
+      throw new JsFailError('Проверка языка не прошла');
+    }
+    if (currentLanguageCheck === -1) {
+      throw new NewUrlError('Переключаем язык на английский');
+    }
+    log('Проверка языка прошла', 'steelblue');
 
-  const cashOutEnabled = await checkCashOutEnabled();
-  if (cashOutEnabled === 0) {
-    log('Не удалось определить порезку аккаунта', 'steelblue');
-  } else if (cashOutEnabled === -1) {
-    accountLimited();
-    if (worker.PauseOnLimitedAccount) {
-      throw new JsFailError();
+    const cashOutEnabled = await checkCashOutEnabled();
+    if (cashOutEnabled === 0) {
+      log('Не удалось определить порезку аккаунта', 'steelblue');
+    } else if (cashOutEnabled === -1) {
+      accountLimited();
+      if (worker.PauseOnLimitedAccount) {
+        throw new JsFailError();
+      }
     }
   }
 

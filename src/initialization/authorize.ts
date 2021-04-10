@@ -25,6 +25,7 @@ const authorize = authorizeGenerator({
   // captchaSelector: '',
   // loginedWait: {
   //   loginedSelector: authElementSelector,
+  //   timeout: 5000,
   //   balanceReady,
   //   updateBalance,
   //   afterSuccesfulLogin,

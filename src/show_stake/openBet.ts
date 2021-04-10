@@ -5,9 +5,15 @@ import {
 } from '@kot-shrodingera-team/germes-utils';
 import { JsFailError } from '@kot-shrodingera-team/germes-utils/errors';
 import getStakeCount from '../stake_info/getStakeCount';
+import clearCoupon from './clearCoupon';
 import changeToStandardBetslip from './helpers/changeToStandardBetslip';
 
 const openBet = async (): Promise<void> => {
+  const couponCleared = await clearCoupon();
+  if (!couponCleared) {
+    throw new JsFailError('Не удалось очистить купон');
+  }
+
   // Получение данных из меты
   const { betId, fi, od, zw } = (() => {
     if (worker.BetId.startsWith('{')) {

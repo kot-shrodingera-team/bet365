@@ -295,10 +295,12 @@ const check = () => {
     case 'error':
     case 'success':
     case 'reopened':
-      log(`Обработка ставки завершена (${step})${additionalInfo}`, 'orange');
+      log(`Обработка ставки завершена${additionalInfo}`, 'orange');
+      log(step, 'orange', true);
       return false;
     default:
-      log(`Обработка ставки (${step})${additionalInfo}`, 'tan');
+      log(`Обработка ставки${additionalInfo}`, 'tan');
+      log(step, 'tan', true);
       return true;
   }
 };

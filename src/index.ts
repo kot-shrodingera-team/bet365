@@ -9,6 +9,7 @@ import afterSuccesfulStake from './worker_callbacks/afterSuccesfulStake';
 import fastLoad from './fastLoad';
 import initialize from './initialization';
 import showStake from './show_stake';
+import { clearGermesData } from './bookmakerApi';
 
 worker.SetCallBacks(
   log,
@@ -21,12 +22,18 @@ worker.SetCallBacks(
 );
 
 worker.SetFastCallback(fastLoad);
+clearGermesData();
 
 (async (): Promise<void> => {
-  if (localStorage.getItem('couponOpening') === '1' && worker.IsShowStake) {
+  if (
+    worker.GetSessionData(`${window.germesData.bookmakerName}.ShowStake`) ===
+      '1' &&
+    worker.IsShowStake
+  ) {
     log('Загрузка страницы с открытием купона', 'steelblue');
     showStake();
   } else if (!worker.IsShowStake) {
+    worker.SetSessionData(`${window.germesData.bookmakerName}.ShowStake`, '0');
     log('Загрузка страницы с авторизацией', 'steelblue');
     initialize();
   } else {

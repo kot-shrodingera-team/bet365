@@ -6,7 +6,7 @@ import afterSuccesfulLogin from './afterSuccesfulLogin';
 
 const initialize = initializeGenerator({
   authStateReady,
-  authStateReadyTimeout: 5000,
+  // authStateReadyTimeout: 5000,
   checkAuth,
   balanceReady,
   updateBalance,

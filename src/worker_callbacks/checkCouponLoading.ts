@@ -8,6 +8,7 @@ import {
   getRemainingTimeout,
   checkCouponLoadingError,
   checkCouponLoadingSuccess,
+  getWorkerParameter,
 } from '@kot-shrodingera-team/germes-utils';
 import {
   accountRestricted,
@@ -22,23 +23,37 @@ import getCouponError, {
 } from '../show_stake/helpers/getCouponError';
 import openBet from '../show_stake/openBet';
 
+const loaderSelector = '.bss-ProcessingButton';
+const referBetSelector = '.bss-ReferBetConfirmation';
+// const errorSelector = '.bss-Footer_MessageBody';
+const placeBetErrorSelector = '.bs-PlaceBetErrorMessage_Contents';
+const acceptButtonSelector = '.bs-AcceptButton';
+const receiptTickSelector = '.bss-ReceiptContent_Tick';
+
+const errorAwaiter = () => {
+  return awaiter(
+    () => getCouponError() !== CouponError.NoError,
+    getRemainingTimeout()
+  );
+};
+
+const betProcessingStartDelay = getWorkerParameter(
+  'betProcessingStartDelay',
+  'number'
+) as number;
+
+const betProcessingLoaderDissapearMaxDelay = getWorkerParameter(
+  'betProcessingStartDelay',
+  'number'
+) as number;
+
 const asyncCheck = async () => {
-  const loaderSelector = '.bss-ProcessingButton';
-  const referBetSelector = '.bss-ReferBetConfirmation';
-  // const errorSelector = '.bss-Footer_MessageBody';
-  const placeBetErrorSelector = '.bs-PlaceBetErrorMessage_Contents';
-  const acceptButtonSelector = '.bs-AcceptButton';
-  const receiptTickSelector = '.bss-ReceiptContent_Tick';
-
-  const errorAwaiter = () =>
-    awaiter(
-      () => getCouponError() !== CouponError.NoError,
-      getRemainingTimeout()
-    );
-
   window.germesData.betProcessingStep = 'waitingForLoaderOrResult';
 
   await Promise.race([
+    ...(betProcessingStartDelay !== undefined
+      ? [sleep(betProcessingStartDelay)]
+      : []),
     getElement(loaderSelector, getRemainingTimeout()),
     getElement(referBetSelector, getRemainingTimeout()),
     errorAwaiter(),
@@ -47,26 +62,46 @@ const asyncCheck = async () => {
     getElement(receiptTickSelector, getRemainingTimeout()),
   ]);
 
+  if (
+    new Date().getTime() - window.germesData.doStakeTime.getTime() >
+    betProcessingStartDelay
+  ) {
+    return checkCouponLoadingError({
+      botMessage: `Не дождались появления индикатора за ${betProcessingStartDelay} мс`,
+    });
+  }
+
   const loaderElement = document.querySelector(loaderSelector);
 
   if (loaderElement) {
     log('Появился индикатор', 'steelblue');
     window.germesData.betProcessingAdditionalInfo = 'индикатор';
-    awaiter(
-      () => {
-        return document.querySelector(loaderSelector) === null;
-      },
-      getRemainingTimeout(),
-      100
-    ).then((loaderDissappeared) => {
-      if (loaderDissappeared) {
-        log('Исчез индикатор', 'steelblue');
-        window.germesData.betProcessingAdditionalInfo = null;
-      }
-    });
-
     window.germesData.betProcessingStep = 'waitingForResult';
+
     await Promise.race([
+      awaiter(
+        () => {
+          return document.querySelector(loaderSelector) === null;
+        },
+        getRemainingTimeout(),
+        100
+      ),
+      getElement(referBetSelector, getRemainingTimeout()),
+      errorAwaiter(),
+      getElement(placeBetErrorSelector, getRemainingTimeout()),
+      getElement(acceptButtonSelector, getRemainingTimeout()),
+      getElement(receiptTickSelector, getRemainingTimeout()),
+    ]);
+
+    if (document.querySelector(loaderSelector) === null) {
+      log('Исчез индикатор', 'steelblue');
+      window.germesData.betProcessingAdditionalInfo = null;
+    }
+
+    await Promise.race([
+      ...(betProcessingLoaderDissapearMaxDelay !== undefined
+        ? [sleep(betProcessingLoaderDissapearMaxDelay)]
+        : []),
       getElement(referBetSelector, getRemainingTimeout()),
       errorAwaiter(),
       getElement(placeBetErrorSelector, getRemainingTimeout()),
@@ -275,6 +310,13 @@ const asyncCheck = async () => {
       }
     }
     return checkCouponLoadingSuccess('Появилась иконка успешной ставки');
+  }
+
+  // Если появлялся лоадер, но прошло время betProcessingLoaderDissapearMaxDelay
+  if (loaderElement && betProcessingLoaderDissapearMaxDelay !== undefined) {
+    return checkCouponLoadingError({
+      botMessage: `Результат не появился в течении ${betProcessingLoaderDissapearMaxDelay} после пропадания индикатора`,
+    });
   }
 
   return checkCouponLoadingError({

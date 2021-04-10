@@ -1,3 +1,4 @@
+import { getWorkerParameter } from '@kot-shrodingera-team/germes-utils';
 import {
   checkCashOutEnabled,
   accountLimited,
@@ -5,13 +6,15 @@ import {
 import checkCurrentLanguage from '../show_stake/helpers/checkCurrentLanguage';
 
 const afterSuccesfulLogin = async (): Promise<void> => {
-  await checkCurrentLanguage();
-  const cashOutEnabled = await checkCashOutEnabled();
-  if (cashOutEnabled === 0) {
-    return;
-  }
-  if (cashOutEnabled === -1) {
-    accountLimited();
+  if (!getWorkerParameter('fakeAuth')) {
+    await checkCurrentLanguage();
+    const cashOutEnabled = await checkCashOutEnabled();
+    if (cashOutEnabled === 0) {
+      return;
+    }
+    if (cashOutEnabled === -1) {
+      accountLimited();
+    }
   }
 };
 

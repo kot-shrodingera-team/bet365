@@ -71,7 +71,10 @@ const getBalance = (): number => {
 };
 
 export const updateBalance = (): void => {
-  if (getWorkerParameter('fakeBalance') || getWorkerParameter('fakeAuth')) {
+  if (
+    getWorkerParameter('fakeBalance', 'number') ||
+    getWorkerParameter('fakeAuth')
+  ) {
     worker.JSBalanceChange(getBalance());
     return;
   }

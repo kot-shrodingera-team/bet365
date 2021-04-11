@@ -37,17 +37,17 @@ const errorAwaiter = () => {
   );
 };
 
-const betProcessingStartDelay = getWorkerParameter(
-  'betProcessingStartDelay',
-  'number'
-) as number;
-
-const betProcessingLoaderDissapearMaxDelay = getWorkerParameter(
-  'betProcessingLoaderDissapearMaxDelay',
-  'number'
-) as number;
-
 const asyncCheck = async () => {
+  const betProcessingStartDelay = getWorkerParameter(
+    'betProcessingStartDelay',
+    'number'
+  ) as number;
+
+  const betProcessingLoaderDissapearMaxDelay = getWorkerParameter(
+    'betProcessingLoaderDissapearMaxDelay',
+    'number'
+  ) as number;
+
   window.germesData.betProcessingStep = 'waitingForLoaderOrResult';
 
   await Promise.race([

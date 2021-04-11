@@ -206,21 +206,21 @@ const asyncCheck = async () => {
           botMessage: 'Ставка недоступна',
         });
       }
+      log('Изменение котировок', 'crimson');
       if (!acceptButton) {
         log('Не найдена кнопка принятия изменений', 'crimson');
       } else {
         log('Принимаем изменения', 'orange');
         acceptButton.click();
       }
-      return checkCouponLoadingError({
-        botMessage: 'Изменение котировок',
-      });
+      return checkCouponLoadingError({});
     }
     if (
       couponError === CouponError.NewMaximum ||
       couponError === CouponError.NewMaximumShort ||
       couponError === CouponError.UnknownMaximum
     ) {
+      log('Превышена максимальная ставка', 'crimson');
       updateMaximumStake();
       if (!acceptButton) {
         log('Не найдена кнопка принятия изменений', 'crimson');
@@ -234,9 +234,7 @@ const asyncCheck = async () => {
         log('Задержка после появления максимума');
         await sleep(delay);
       }
-      return checkCouponLoadingError({
-        botMessage: 'Превышена максимальная ставка',
-      });
+      return checkCouponLoadingError({});
     }
     if (couponError === CouponError.Unknown) {
       const couponErrorText = getCouponErrorText();
@@ -315,7 +313,7 @@ const asyncCheck = async () => {
   // Если появлялся лоадер, но прошло время betProcessingLoaderDissapearMaxDelay
   if (loaderElement && betProcessingLoaderDissapearMaxDelay !== undefined) {
     return checkCouponLoadingError({
-      botMessage: `Результат не появился в течении ${betProcessingLoaderDissapearMaxDelay} после пропадания индикатора`,
+      botMessage: `Результат не появился в течении ${betProcessingLoaderDissapearMaxDelay} мс после пропадания индикатора`,
     });
   }
 

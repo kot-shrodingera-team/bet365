@@ -45,7 +45,10 @@ const preCheck = async (): Promise<void> => {
   await balanceReady();
   updateBalance();
 
-  if (!getWorkerParameter('fakeAuth')) {
+  if (
+    !getWorkerParameter('fakeAuth') &&
+    !getWorkerParameter('disableAccountChecks')
+  ) {
     const currentLanguageCheck = await checkCurrentLanguage();
     if (currentLanguageCheck === 0) {
       throw new JsFailError('Проверка языка не прошла');

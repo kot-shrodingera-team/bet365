@@ -6,7 +6,10 @@ import {
 import checkCurrentLanguage from '../show_stake/helpers/checkCurrentLanguage';
 
 const afterSuccesfulLogin = async (): Promise<void> => {
-  if (!getWorkerParameter('fakeAuth')) {
+  if (
+    !getWorkerParameter('fakeAuth') &&
+    !getWorkerParameter('disableAccountChecks')
+  ) {
     await checkCurrentLanguage();
     const cashOutEnabled = await checkCashOutEnabled();
     if (cashOutEnabled === 0) {

@@ -43,7 +43,7 @@ const betProcessingStartDelay = getWorkerParameter(
 ) as number;
 
 const betProcessingLoaderDissapearMaxDelay = getWorkerParameter(
-  'betProcessingStartDelay',
+  'betProcessingLoaderDissapearMaxDelay',
   'number'
 ) as number;
 

@@ -1,5 +1,5 @@
 import getStakeInfoGenerator from '@kot-shrodingera-team/germes-generators/worker_callbacks/getStakeInfo';
-import { log } from '@kot-shrodingera-team/germes-utils';
+import { getWorkerParameter, log } from '@kot-shrodingera-team/germes-utils';
 import checkAuth from '../stake_info/checkAuth';
 import getStakeCount from '../stake_info/getStakeCount';
 import getBalance from '../stake_info/getBalance';
@@ -12,6 +12,12 @@ import getCurrentSum from '../stake_info/getCurrentSum';
 import showStake from '../show_stake';
 
 const isReShowStakeNeeded = () => {
+  if (
+    getWorkerParameter('fakeStakeEnabled') ||
+    getWorkerParameter('fakeOpenStake')
+  ) {
+    return false;
+  }
   const bet = document.querySelector('.bss-NormalBetItem');
   if (!bet) {
     log('Не найдена ставка в купоне', 'crimson');

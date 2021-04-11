@@ -1,3 +1,4 @@
+import { getWorkerParameter } from '@kot-shrodingera-team/germes-utils';
 // import getStakeCountGenerator from '@kot-shrodingera-team/germes-generators/stake_info/getStakeCount';
 
 // Locator.betSlipManager.getBetCount();
@@ -9,6 +10,12 @@
 // });
 
 const getStakeCount = (): number => {
+  if (
+    getWorkerParameter('fakeStakeCount') ||
+    getWorkerParameter('fakeOpenStake')
+  ) {
+    return 1;
+  }
   return Locator.betSlipManager.getBetCount();
 };
 

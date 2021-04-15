@@ -13,8 +13,9 @@ const openEvent = async (): Promise<void> => {
   const prematchOnly = getWorkerParameter('prematchOnly');
   const sendLiveMatchTime = getWorkerParameter('sendLiveMatchTime');
   if (prematchOnly || sendLiveMatchTime) {
-    if (window.location.hash === '#/IP/B1') {
+    if (window.location.hash !== '#/IP/B1') {
       log('Открываем Overview футбола', 'orange');
+      window.location.hash = '#/IP/B1';
       const footballIconSelected = await getElement(
         '.ovm-ClassificationBarButton-1.ovm-ClassificationBarButton-active'
       );

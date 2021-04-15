@@ -6,7 +6,10 @@ import {
   toFormData,
 } from '@kot-shrodingera-team/germes-utils';
 
-import { JsFailError } from '@kot-shrodingera-team/germes-utils/errors';
+import {
+  JsFailError,
+  NewUrlError,
+} from '@kot-shrodingera-team/germes-utils/errors';
 import findEventInOverview from './helpers/findEventInOverview';
 
 const openEvent = async (): Promise<void> => {
@@ -26,7 +29,8 @@ const openEvent = async (): Promise<void> => {
     await getElement('.ovm-Fixture');
     const targetMatch = await findEventInOverview();
     if (!targetMatch) {
-      throw new JsFailError('Событие не найдено');
+      window.location.reload();
+      throw new NewUrlError('События не найдены. Перезагружаем страницу');
     }
     log('Определяем время матча', 'steelblue');
     await awaiter(() => {

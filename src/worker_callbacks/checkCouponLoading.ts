@@ -181,6 +181,9 @@ const asyncCheck = async () => {
 
   const couponError = getCouponError();
   if (couponError !== CouponError.NoError) {
+    const couponErrorText = getCouponErrorText();
+    log(couponErrorText, 'tomato');
+
     const acceptButton = document.querySelector<HTMLElement>(
       '.bs-AcceptButton'
     );
@@ -222,23 +225,21 @@ const asyncCheck = async () => {
     ) {
       log('Превышена максимальная ставка', 'crimson');
       updateMaximumStake();
+      const delay =
+        2000 - (new Date().getTime() - window.germesData.doStakeTime.getTime());
+      if (delay > 0) {
+        log('Задержка после появления максимума');
+        await sleep(delay);
+      }
       if (!acceptButton) {
         log('Не найдена кнопка принятия изменений', 'crimson');
       } else {
         log('Принимаем изменения', 'orange');
         acceptButton.click();
       }
-      const delay =
-        2 - new Date().getTime() - window.germesData.doStakeTime.getTime();
-      if (delay > 0) {
-        log('Задержка после появления максимума');
-        await sleep(delay);
-      }
       return checkCouponLoadingError({});
     }
     if (couponError === CouponError.Unknown) {
-      const couponErrorText = getCouponErrorText();
-      log(couponErrorText, 'tomato');
       return checkCouponLoadingError({
         informMessage: couponErrorText,
       });

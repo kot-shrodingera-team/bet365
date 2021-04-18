@@ -17,8 +17,8 @@ const accountStep2Regex = /In accordance with licensing conditions we are requir
 const accountSurveyRegex = /As part of the ongoing management of your account we need you to answer a set of questions relating to Responsible Gambling. Certain restrictions may be applied to your account until you have successfully completed this. You can answer these questions now by going to the Self-Assessment page in Members./i;
 const oddsChangedRegex = /The line, odds or availability of your selections has changed.|The line, odds or availability of selections on your betslip has changed. Please review your betslip/i;
 
-const newMaximumErrorRegex = /^Stake\/risk entered on selection .* is above the available maximum of .*?(\d+\.\d+)\.$/i;
-const newMaximumShortErrorRegex = /^Max Stake .*?(\d+\.\d+)$/i;
+const newMaximumErrorRegex = /^Stake\/risk entered on selection .* is above the available maximum of .*?(\d+\.\d+).*?$/i;
+const newMaximumShortErrorRegex = /^Max Stake .*?(\d+\.\d+).*?$/i;
 const unknownMaximumErrorRegex = /^Your stake exceeds the maximum allowed$/i;
 
 const getCouponError = (): CouponError => {
@@ -92,10 +92,39 @@ export const updateMaximumStake = (): void => {
   }
   const unknownMaximumMatch = betErrorMessage.match(unknownMaximumErrorRegex);
   if (unknownMaximumMatch) {
-    log('Неизвестный максимум', 'orange');
+    log('Нет максимума в тексте ошибки', 'steelblue');
+    const maximumMessageElement = document.querySelector(
+      '.bss-NormalBetItem_MessageBody'
+    );
+    if (!maximumMessageElement) {
+      log(
+        'Нет ни максимума в тексте ошибки, ни отдельного элемента с максимумом',
+        'crimson'
+      );
+      window.germesData.maximumStake = 0;
+      return;
+    }
+    log('Есть отдельный элемент с максимумом', 'steelblue');
+    const maximumMessage = maximumMessageElement.textContent.trim();
+
+    log(maximumMessage, 'tomato');
+
+    const maximumMath = maximumMessage.match(newMaximumShortErrorRegex);
+
+    if (maximumMath) {
+      const newMaximum = Number(maximumMath[1]);
+      log(`Новый максимум: "${newMaximum}"`, 'orange');
+      window.germesData.maximumStake = newMaximum;
+      return;
+    }
+    log(
+      `Не удалось получить максимум из сообщения: "${maximumMessage}"`,
+      'crimson'
+    );
     window.germesData.maximumStake = 0;
+    return;
   }
-  log('Неизвестный максимум', 'orange');
+  log('Неизвестный максимум', 'crimson');
   window.germesData.maximumStake = 0;
 };
 

@@ -75,6 +75,10 @@ const preCheck = (): boolean => {
     log(couponErrorText, 'tomato');
     return false;
   }
+  if (acceptButton) {
+    log('Есть кнопка принятия изменений, но нет ошибки', 'crimson');
+    log('Принимаем изменения', 'orange');
+    acceptButton.click();
   }
   return true;
 };

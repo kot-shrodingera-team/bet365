@@ -13,6 +13,15 @@ import getCouponError, {
 import getStakeCount from './getStakeCount';
 
 const preCheck = (): boolean => {
+  const betslipModule = document.querySelector('.bsm-BetslipStandardModule');
+  if (
+    betslipModule &&
+    ![...betslipModule.classList].includes('bsm-BetslipStandardModule_Expanded')
+  ) {
+    log('Купон не развёрнут', 'crimson');
+    return false;
+  }
+
   const couponError = getCouponError();
   const acceptButton = document.querySelector<HTMLElement>('.bs-AcceptButton');
 
@@ -66,13 +75,6 @@ const preCheck = (): boolean => {
     log(couponErrorText, 'tomato');
     return false;
   }
-  const betslipModule = document.querySelector('.bsm-BetslipStandardModule');
-  if (
-    betslipModule &&
-    ![...betslipModule.classList].includes('bsm-BetslipStandardModule_Expanded')
-  ) {
-    log('Купон не развёрнут', 'crimson');
-    return false;
   }
   return true;
 };

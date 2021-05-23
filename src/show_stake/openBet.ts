@@ -66,7 +66,8 @@ const openBet = async (): Promise<void> => {
   const quickBetslipSelector = '.bss-BetslipStandardModule_QuickBetExpanded';
   const eventNameSelector = '.bss-NormalBetItem_FixtureDescription';
   const marketNameSelector = '.bss-NormalBetItem_Market';
-  const betNameSelector = '.bss-NormalBetItem_Title ';
+  const betNameSelector = '.bss-NormalBetItem_Title';
+  const betHandicapSelector = '.bss-NormalBetItem_Handicap';
 
   await Promise.race([
     getElement(eventNameSelector),
@@ -118,7 +119,16 @@ const openBet = async (): Promise<void> => {
     }
   }
 
-  const betName = betNameElement.textContent.trim();
+  const betHandicapElement = document.querySelector(betHandicapSelector);
+  const betHandicap = betHandicapElement
+    ? betHandicapElement.textContent.trim()
+    : '';
+
+  const betNameRaw = betNameElement.textContent.trim();
+
+  const betName = betHandicap
+    ? betNameRaw.replace(betHandicap, ` ${betHandicap}`)
+    : betNameRaw;
 
   log(`Открыта ставка\n${eventName}\n${marketName}\n${betName}`, 'steelblue');
 };

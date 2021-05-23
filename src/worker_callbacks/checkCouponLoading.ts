@@ -180,7 +180,31 @@ const asyncCheck = async () => {
     ]);
   }
 
-  const couponError = getCouponError();
+  let couponError = getCouponError();
+
+  const acceptButtonElement = document.querySelector(acceptButtonSelector);
+  if (acceptButtonElement) {
+    if (couponError === CouponError.NoError) {
+      log('Появилась кнопка принятия изменений, но нет сообщения', 'steelblue');
+      const errorAppeared = await awaiter(
+        () => {
+          couponError = getCouponError();
+          return couponError !== CouponError.NoError;
+        },
+        5000,
+        50
+      );
+      if (!errorAppeared) {
+        return checkCouponLoadingError({
+          botMessage:
+            'Не появилось сообщение после появления кнопки принятия изменений',
+          informMessage:
+            'Не появилось сообщение после появления кнопки принятия изменений',
+        });
+      }
+    }
+  }
+
   if (couponError !== CouponError.NoError) {
     const couponErrorText = getCouponErrorText();
     log(couponErrorText, 'tomato');
@@ -273,14 +297,6 @@ const asyncCheck = async () => {
       reopen: {
         openBet,
       },
-    });
-  }
-
-  const acceptButtonElement = document.querySelector(acceptButtonSelector);
-  if (acceptButtonElement) {
-    return checkCouponLoadingError({
-      botMessage: 'Появилась кнопка принятия изменений, но нет сообщения',
-      informMessage: 'Появилась кнопка принятия изменений, но нет сообщения',
     });
   }
 

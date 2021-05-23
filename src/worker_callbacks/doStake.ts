@@ -3,6 +3,14 @@ import { getWorkerParameter, log } from '@kot-shrodingera-team/germes-utils';
 import getCoefficient from '../stake_info/getCoefficient';
 
 const preCheck = (): boolean => {
+  window.germesData.prevLastBet = document.querySelector('.mbr-OpenBetItem');
+  if (getWorkerParameter('resultCoefficientTest')) {
+    if (window.germesData.prevLastBet) {
+      log('Есть предыдущая ставка в истории', 'steelblue');
+    } else {
+      log('Нет предыдущей ставки в истории', 'steelblue');
+    }
+  }
   const betslipBetCreditsCheckbox = document.querySelector<HTMLElement>(
     '.bsc-BetCreditsHeader_CheckBox'
   );

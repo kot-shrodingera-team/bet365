@@ -47,6 +47,8 @@ declare global {
       placeNowValue: number;
       referredValue: number;
     };
+    resultCoefficient: number;
+    prevLastBet: Element;
   }
 }
 
@@ -61,6 +63,8 @@ export const clearGermesData = (): void => {
     maximumStake: undefined,
     acceptChangesDelayStart: undefined,
     referredBetData: undefined,
+    resultCoefficient: undefined,
+    prevLastBet: undefined,
   };
 };
 

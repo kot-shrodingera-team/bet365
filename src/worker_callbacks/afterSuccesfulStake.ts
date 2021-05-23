@@ -2,9 +2,9 @@
 import {
   getWorkerParameter,
   log,
-  toFormData,
+  // toFormData,
 } from '@kot-shrodingera-team/germes-utils';
-import getCoefficient from '../stake_info/getCoefficient';
+// import getCoefficient from '../stake_info/getCoefficient';
 
 // const getResultCoefficientText = (): string => {
 //   return null;
@@ -24,42 +24,45 @@ import getCoefficient from '../stake_info/getCoefficient';
 //   context: () => document,
 // });
 
-const getResultCoefficient = getCoefficient;
+// const getResultCoefficient = getCoefficient;
 
 const afterSuccesfulStake = (): void => {
   if (getWorkerParameter('fakeDoStake')) {
     return;
   }
-  log('Обновление итогового коэффициента', 'steelblue');
-  const resultCoefficient = getResultCoefficient();
-  if (resultCoefficient && resultCoefficient !== worker.StakeInfo.Coef) {
-    log(
-      `Коеффициент изменился: ${worker.StakeInfo.Coef} => ${resultCoefficient}`,
-      'orange'
-    );
-    worker.StakeInfo.Coef = resultCoefficient;
-    return;
-  }
-  log('Коеффициент не изменился', 'lightblue');
-  if (getWorkerParameter('sendBetRef')) {
-    const betReferenceElement = document.querySelector(
-      '.bss-ReceiptContent_BetRef'
-    );
-    if (!betReferenceElement) {
-      log('Не найден Bet Reference', 'crimson');
+
+  if (getWorkerParameter('resultCoefficientTest')) {
+    // log('Обновление итогового коэффициента', 'steelblue');
+    const { resultCoefficient } = window.germesData;
+    if (resultCoefficient && resultCoefficient !== worker.StakeInfo.Coef) {
+      log(
+        `Коеффициент изменился: ${worker.StakeInfo.Coef} => ${resultCoefficient}`,
+        'orange'
+      );
+      worker.StakeInfo.Coef = resultCoefficient;
       return;
     }
-    const bodyData = toFormData({
-      bot_api: worker.ApiKey,
-      fork_id: worker.ForkId,
-      bet365_bet_id: betReferenceElement.textContent
-        .replace('Bet Ref', '')
-        .trim(),
-    });
-    fetch('https://strike.ws/bet_365_bet_ids_to_our_server.php', {
-      method: 'POST',
-      body: bodyData,
-    });
+    log('Коеффициент не изменился', 'lightblue');
+    // if (getWorkerParameter('sendBetRef')) {
+    //   const betReferenceElement = document.querySelector(
+    //     '.bss-ReceiptContent_BetRef'
+    //   );
+    //   if (!betReferenceElement) {
+    //     log('Не найден Bet Reference', 'crimson');
+    //     return;
+    //   }
+    //   const bodyData = toFormData({
+    //     bot_api: worker.ApiKey,
+    //     fork_id: worker.ForkId,
+    //     bet365_bet_id: betReferenceElement.textContent
+    //       .replace('Bet Ref', '')
+    //       .trim(),
+    //   });
+    //   fetch('https://strike.ws/bet_365_bet_ids_to_our_server.php', {
+    //     method: 'POST',
+    //     body: bodyData,
+    //   });
+    // }
   }
 };
 

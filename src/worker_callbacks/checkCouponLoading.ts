@@ -22,6 +22,7 @@ import getCouponError, {
   updateMaximumStake,
 } from '../show_stake/helpers/getCouponError';
 import openBet from '../show_stake/openBet';
+import getPlacedBetCoefficient from './helpers/getPlacedBetCoefficient';
 
 const loaderSelector = '.bss-ProcessingButton';
 const referBetSelector = '.bss-ReferBetConfirmation';
@@ -308,7 +309,14 @@ const asyncCheck = async () => {
         worker.Helper.SendInformedMessage(message);
       }
     }
-    return checkCouponLoadingSuccess('Появилась иконка успешной ставки');
+
+    log('Появилась иконка успешной ставки', 'steelblue');
+
+    if (getWorkerParameter('resultCoefficientTest')) {
+      await getPlacedBetCoefficient();
+    }
+
+    return checkCouponLoadingSuccess();
   }
 
   // Если появлялся лоадер, но прошло время betProcessingLoaderDissapearMaxDelay
@@ -337,11 +345,11 @@ const check = () => {
     case 'success':
     case 'reopened':
       log(`Обработка ставки завершена${additionalInfo}`, 'orange');
-      log(step, 'orange', true);
+      // log(step, 'orange', true);
       return false;
     default:
       log(`Обработка ставки${additionalInfo}`, 'tan');
-      log(step, 'tan', true);
+      // log(step, 'tan', true);
       return true;
   }
 };

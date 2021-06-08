@@ -12,7 +12,9 @@ const findEventInOverview = async (): Promise<HTMLElement> => {
     return null;
   }
   const matches = [] as HTMLElement[];
-  log(`Ищем событие "${worker.TeamOne} - ${worker.TeamTwo}"`, 'white', true);
+  const workerTeamOne = worker.TeamOne;
+  const workerTeamTwo = worker.TeamTwo.replace(/_eventid\[[^\]]*]$/, '');
+  log(`Ищем событие "${workerTeamOne} - ${workerTeamTwo}"`, 'white', true);
   while (
     scroller.scrollTop !==
     overviewContent.offsetHeight - scroller.offsetHeight
@@ -39,7 +41,7 @@ const findEventInOverview = async (): Promise<HTMLElement> => {
       const teamNameOne = teamNameOneElement.textContent.trim();
       const teamNameTwo = teamNameTwoElement.textContent.trim();
       log(`${teamNameOne} - ${teamNameTwo}`, 'white', true);
-      return teamNameOne === worker.TeamOne && teamNameTwo === worker.TeamTwo;
+      return teamNameOne === workerTeamOne && teamNameTwo === workerTeamTwo;
     });
     if (targetMatch) {
       return targetMatch;

@@ -1,4 +1,9 @@
-import { awaiter, getElement, log } from '@kot-shrodingera-team/germes-utils';
+import {
+  awaiter,
+  getElement,
+  log,
+  text,
+} from '@kot-shrodingera-team/germes-utils';
 
 const getPlacedBetCoefficient = async (): Promise<void> => {
   const eventNameSelector = '.bss-NormalBetItem_FixtureDescription';
@@ -22,14 +27,12 @@ const getPlacedBetCoefficient = async (): Promise<void> => {
     return;
   }
 
-  const eventName = eventNameElement.textContent.trim();
-  const marketName = marketNameElement.textContent.trim();
+  const eventName = text(eventNameElement);
+  const marketName = text(marketNameElement);
   const betHandicapElement = document.querySelector(betHandicapSelector);
-  const betHandicap = betHandicapElement
-    ? betHandicapElement.textContent.trim()
-    : '';
+  const betHandicap = betHandicapElement ? text(betHandicapElement) : '';
 
-  const betNameRaw = betNameElement.textContent.trim();
+  const betNameRaw = text(betNameElement);
 
   const betName = betHandicap
     ? betNameRaw.replace(betHandicap, ` ${betHandicap}`)
@@ -44,7 +47,7 @@ const getPlacedBetCoefficient = async (): Promise<void> => {
     log('Не найден Bet Ref успешной ставки', 'crimson');
     return;
   }
-  const betReferenceText = betReferenceElement.textContent.trim();
+  const betReferenceText = text(betReferenceElement);
   const betReferenceRegex = /^Bet Ref (.*)$/i;
   const betReferenceMatch = betReferenceText.match(betReferenceRegex);
   if (!betReferenceMatch) {
@@ -61,21 +64,21 @@ const getPlacedBetCoefficient = async (): Promise<void> => {
     log('Не найден элемент выбора фильтра My Bets', 'crimson');
     return;
   }
-  if (myBetsDropdown.textContent.trim() !== 'All') {
+  if (text(myBetsDropdown) !== 'All') {
     log('Переключаем на All фильтр My Bets', 'orange');
     myBetsDropdown.click();
     const myBetsDropdownAll = [
       ...document.querySelectorAll<HTMLElement>(
         '.mbr-MyBetsRhsModule .mbr-DropDownItem'
       ),
-    ].find((element) => element.textContent.trim() === 'All');
+    ].find((element) => text(element) === 'All');
     if (!myBetsDropdownAll) {
       log('Не найден All фильтр My Bets', 'crimson');
       return;
     }
     myBetsDropdownAll.click();
     const myBetsAllSelected = await awaiter(
-      () => myBetsDropdown.textContent.trim() === 'All',
+      () => text(myBetsDropdown) === 'All',
       1000
     );
     if (!myBetsAllSelected) {
@@ -133,9 +136,9 @@ const getPlacedBetCoefficient = async (): Promise<void> => {
     log('Не найдена роспись последней ставки', 'crimson');
     return;
   }
-  const lastBetEventName = lastBetEventNameElement.textContent.trim();
-  const lastBetMarketName = lastBetMaretNameElement.textContent.trim();
-  const lastBetBetName = lastBetBetNameElement.textContent.trim();
+  const lastBetEventName = text(lastBetEventNameElement);
+  const lastBetMarketName = text(lastBetMaretNameElement);
+  const lastBetBetName = text(lastBetBetNameElement);
 
   log(
     `Последняя ставка:\n${lastBetEventName}\n${lastBetMarketName}\n${lastBetBetName}`,
@@ -165,7 +168,7 @@ const getPlacedBetCoefficient = async (): Promise<void> => {
     log('Не найден коэффициент последней ставки', 'crimson');
     return;
   }
-  const lastBetOddText = lastBetOddElement.textContent.trim();
+  const lastBetOddText = text(lastBetOddElement);
   const lastBetOdd = Number(lastBetOddText);
   if (Number.isNaN(lastBetOdd)) {
     log(

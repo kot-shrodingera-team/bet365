@@ -10,13 +10,17 @@ const afterSuccesfulLogin = async (): Promise<void> => {
     !getWorkerParameter('fakeAuth') &&
     !getWorkerParameter('disableAccountChecks')
   ) {
-    await checkCurrentLanguage();
-    const cashOutEnabled = await checkCashOutEnabled();
-    if (cashOutEnabled === 0) {
-      return;
+    if (!getWorkerParameter('disableLanguageCheck')) {
+      await checkCurrentLanguage();
     }
-    if (cashOutEnabled === -1) {
-      accountLimited();
+    if (!getWorkerParameter('disableCashOutCheck')) {
+      const cashOutEnabled = await checkCashOutEnabled();
+      if (cashOutEnabled === 0) {
+        return;
+      }
+      if (cashOutEnabled === -1) {
+        accountLimited();
+      }
     }
   }
 };

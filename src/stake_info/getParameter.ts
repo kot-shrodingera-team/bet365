@@ -2,6 +2,7 @@ import {
   getWorkerParameter,
   log,
   ri,
+  text,
 } from '@kot-shrodingera-team/germes-utils';
 import getSiteTeamNames from '../show_stake/helpers/checkBet/getSiteTeamNames';
 import {
@@ -36,7 +37,7 @@ const getParameter = (): number => {
     return parameter;
   }
 
-  const marketNameSelector = '.bss-NormalBetItem_Title';
+  const marketNameSelector = '.bss-NormalBetItem_Market';
   const betNameSelector = '.bss-NormalBetItem_Title';
 
   const marketNameElement = document.querySelector(marketNameSelector);
@@ -51,8 +52,8 @@ const getParameter = (): number => {
     return -9999;
   }
 
-  const marketName = marketNameElement.textContent.trim();
-  let betName = betNameElement.textContent.trim();
+  const marketName = text(marketNameElement);
+  let betName = text(betNameElement);
 
   if (/^(Draw No Bet)$/i.test(marketName)) {
     return 0;
@@ -64,7 +65,7 @@ const getParameter = (): number => {
 
   if (betslipHandicapElement) {
     log('Есть отдельный элемент параметра', 'white', true);
-    const betslipHandicap = betslipHandicapElement.textContent.trim();
+    const betslipHandicap = text(betslipHandicapElement);
     if (
       betslipHandicap &&
       betName.endsWith(betslipHandicap) &&

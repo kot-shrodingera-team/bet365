@@ -1,25 +1,39 @@
-import { getWorkerParameter } from '@kot-shrodingera-team/germes-utils';
+import getStakeInfoValueGenerator, {
+  stakeInfoValueReadyGenerator,
+} from '@kot-shrodingera-team/germes-generators/stake_info/getStakeInfoValue';
+import { StakeInfoValueOptions } from '@kot-shrodingera-team/germes-generators/stake_info/types';
 import getBalance from './getBalance';
 
-const getMaximumStake = (): number => {
-  if (
-    getWorkerParameter('fakeMaximumStake', 'number') ||
-    getWorkerParameter('fakeAuth') ||
-    getWorkerParameter('fakeOpenStake')
-  ) {
-    const fakeMaximumStake = getWorkerParameter(
-      'fakeMaximumStake',
-      'number'
-    ) as number;
-    if (fakeMaximumStake !== undefined) {
-      return fakeMaximumStake;
-    }
-    return 100000;
-  }
-  if (window.germesData.maximumStake !== undefined) {
-    return window.germesData.maximumStake;
-  }
-  return getBalance();
+// export const maximumStakeSelector = '';
+
+const maximumStakeOptions: StakeInfoValueOptions = {
+  name: 'maximumStake',
+  fixedValue: () => getBalance(),
+  // valueFromText: {
+  //   text: {
+  //     // getText: () => '',
+  //     selector: maximumStakeSelector,
+  //     context: () => document,
+  //   },
+  //   replaceDataArray: [
+  //     {
+  //       searchValue: '',
+  //       replaceValue: '',
+  //     },
+  //   ],
+  //   removeRegex: /[\s,']/g,
+  //   matchRegex: /(\d+(?:\.\d+)?)/,
+  //   errorValue: 0,
+  // },
+  // zeroValues: [],
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // modifyValue: (value: number, extractType: string) => value,
+  // disableLog: false,
 };
+
+const getMaximumStake = getStakeInfoValueGenerator(maximumStakeOptions);
+
+export const maximumStakeReady =
+  stakeInfoValueReadyGenerator(maximumStakeOptions);
 
 export default getMaximumStake;

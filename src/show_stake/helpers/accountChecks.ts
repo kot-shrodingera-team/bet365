@@ -2,9 +2,9 @@ import { getElement, log } from '@kot-shrodingera-team/germes-utils';
 
 export const checkCashOutEnabled = async (timeout = 5000): Promise<number> => {
   window.location.hash = '#/MB/';
-  await getElement('.myb-MyBetsHeader_Button', timeout);
+  await getElement('.myb-MyBetsHeader_Button, .myb-HeaderButton', timeout);
   const myBetsFilterButtons = [
-    ...document.querySelectorAll('.myb-MyBetsHeader_Button'),
+    ...document.querySelectorAll('.myb-MyBetsHeader_Button, .myb-HeaderButton'),
   ];
   if (myBetsFilterButtons.length === 0) {
     log(
@@ -15,7 +15,9 @@ export const checkCashOutEnabled = async (timeout = 5000): Promise<number> => {
     return 0;
   }
   const cashOutFilterButton = myBetsFilterButtons.find(
-    (button) => button.textContent === 'Cash Out'
+    (button) =>
+      button.textContent === 'Cash Out' ||
+      button.textContent === 'Chiudi Scommessa' // Итальянская версия
   );
   if (!cashOutFilterButton) {
     log(

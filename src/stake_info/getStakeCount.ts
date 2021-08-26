@@ -16,7 +16,7 @@ const getStakeCount = (): number => {
   ) {
     return 1;
   }
-  return Locator.betSlipManager.getBetCount();
+  return BetSlipLocator.betSlipManager.getBetCount();
 };
 
 export default getStakeCount;

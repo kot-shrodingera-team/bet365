@@ -3,7 +3,11 @@ import authorizeGenerator from '@kot-shrodingera-team/germes-generators/initiali
 // import { updateBalance, balanceReady } from '../stake_info/getBalance';
 // import afterSuccesfulLogin from './afterSuccesfulLogin';
 
-// const setLoginType = async (): Promise<boolean> => {
+// const preInputCheck = async (): Promise<boolean> => {
+//   return true;
+// };
+
+// const beforeSubmitCheck = async (): Promise<boolean> => {
 //   return true;
 // };
 
@@ -15,13 +19,14 @@ const authorize = authorizeGenerator({
     // triesInterval: 1000,
     // afterOpenDelay: 0,
   },
-  // setLoginType,
+  // preInputCheck,
   loginInputSelector: 'input.lms-StandardLogin_Username',
   passwordInputSelector: 'input.lms-StandardLogin_Password',
   submitButtonSelector: '.lms-StandardLogin_LoginButtonText',
   // inputType: 'fireEvent',
   // fireEventNames: ['input'],
   // beforeSubmitDelay: 0,
+  // beforeSubmitCheck,
   // captchaSelector: '',
   // loginedWait: {
   //   loginedSelector: authElementSelector,

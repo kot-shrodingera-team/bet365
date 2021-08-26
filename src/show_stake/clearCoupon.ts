@@ -6,7 +6,7 @@ import getStakeCount from '../stake_info/getStakeCount';
 // };
 
 const apiClear = (): void => {
-  Locator.betSlipManager.deleteAllBets();
+  BetSlipLocator.betSlipManager.deleteAllBets();
 };
 
 // const postCheck = async (): Promise<boolean> => {

@@ -1,7 +1,9 @@
 import {
   getElement,
+  getWorkerParameter,
   log,
   repeatingOpenBet,
+  text,
 } from '@kot-shrodingera-team/germes-utils';
 import { JsFailError } from '@kot-shrodingera-team/germes-utils/errors';
 import getStakeCount from '../stake_info/getStakeCount';
@@ -9,12 +11,19 @@ import clearCoupon from './clearCoupon';
 import changeToStandardBetslip from './helpers/changeToStandardBetslip';
 
 const openBet = async (): Promise<void> => {
+  /* ======================================================================== */
+  /*                              Очистка купона                              */
+  /* ======================================================================== */
+
   const couponCleared = await clearCoupon();
   if (!couponCleared) {
     throw new JsFailError('Не удалось очистить купон');
   }
 
-  // Получение данных из меты
+  /* ======================================================================== */
+  /*                      Формирование данных для поиска                      */
+  /* ======================================================================== */
+
   const { betId, fi, od, zw } = (() => {
     if (worker.BetId.startsWith('{')) {
       return JSON.parse(worker.BetId);
@@ -49,9 +58,12 @@ const openBet = async (): Promise<void> => {
     Uid,
   };
 
-  // Открытие ставки, проверка, что ставка попала в купон
+  /* ======================================================================== */
+  /*           Открытие ставки, проверка, что ставка попала в купон           */
+  /* ======================================================================== */
+
   const openingAction = async () => {
-    Locator.betSlipManager.addBet({
+    BetSlipLocator.betSlipManager.addBet({
       item: bet,
       action: 0,
       partType,
@@ -63,11 +75,34 @@ const openBet = async (): Promise<void> => {
   };
   await repeatingOpenBet(openingAction, getStakeCount, 5, 1000, 50);
 
+  /* ======================================================================== */
+  /*         Проверка на всплывающее окно о целых параметрах в Италии         */
+  /* ======================================================================== */
+
+  const pushBetDialogCheckTimeout = getWorkerParameter(
+    'pushBetDialogCheckTimeout',
+    'number'
+  ) as number;
+  if (pushBetDialogCheckTimeout) {
+    log('Ожидаем всплывающее окно о целых параметрах', 'white', true);
+    const pushBetDialogOkButton = await getElement<HTMLElement>(
+      '.bil-BetslipPushBetDialog_OkayButton',
+      pushBetDialogCheckTimeout
+    );
+    if (pushBetDialogOkButton) {
+      log('Нажимаем "OK" в окне о целых параметрах', 'orange');
+      pushBetDialogOkButton.click();
+    } else {
+      log('Не было всплывающего окна о целых параметрах', 'steelblue');
+    }
+  }
+
+  /* ======================================================================== */
+  /*                      Переключение мобильного купона                      */
+  /* ======================================================================== */
+
   const quickBetslipSelector = '.bss-BetslipStandardModule_QuickBetExpanded';
   const eventNameSelector = '.bss-NormalBetItem_FixtureDescription';
-  const marketNameSelector = '.bss-NormalBetItem_Market';
-  const betNameSelector = '.bss-NormalBetItem_Title';
-  const betHandicapSelector = '.bss-NormalBetItem_Handicap';
 
   await Promise.race([
     getElement(eventNameSelector),
@@ -83,6 +118,14 @@ const openBet = async (): Promise<void> => {
     await getElement(eventNameSelector);
   }
 
+  /* ======================================================================== */
+  /*                    Вывод информации об открытой ставке                   */
+  /* ======================================================================== */
+
+  const marketNameSelector = '.bss-NormalBetItem_Market';
+  const betNameSelector = '.bss-NormalBetItem_Title';
+  const betHandicapSelector = '.bss-NormalBetItem_Handicap';
+
   const eventNameElement = document.querySelector(eventNameSelector);
   if (!eventNameElement) {
     throw new JsFailError('Не найдено событие открытой ставки');
@@ -96,8 +139,8 @@ const openBet = async (): Promise<void> => {
     throw new JsFailError('Не найдена роспись открытой ставки');
   }
 
-  const eventName = eventNameElement.textContent.trim();
-  const marketName = marketNameElement.textContent.trim();
+  const eventName = text(eventNameElement);
+  const marketName = text(marketNameElement);
 
   // Если есть параметр, нужно его дождаться
   const { param } = JSON.parse(worker.ForkObj);
@@ -120,11 +163,9 @@ const openBet = async (): Promise<void> => {
   }
 
   const betHandicapElement = document.querySelector(betHandicapSelector);
-  const betHandicap = betHandicapElement
-    ? betHandicapElement.textContent.trim()
-    : '';
+  const betHandicap = betHandicapElement ? text(betHandicapElement) : '';
 
-  const betNameRaw = betNameElement.textContent.trim();
+  const betNameRaw = text(betNameElement);
 
   const betName = betHandicap
     ? betNameRaw.replace(betHandicap, ` ${betHandicap}`)

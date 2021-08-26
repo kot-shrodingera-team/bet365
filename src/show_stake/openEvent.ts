@@ -13,6 +13,10 @@ import {
 import findEventInOverview from './helpers/findEventInOverview';
 
 const openEvent = async (): Promise<void> => {
+  /* ======================================================================== */
+  /*                   Определение времени матча для футбола                  */
+  /* ======================================================================== */
+
   const prematchOnly = getWorkerParameter('prematchOnly');
   const sendLiveMatchTime = getWorkerParameter('sendLiveMatchTime');
   if (prematchOnly || sendLiveMatchTime) {

@@ -11,6 +11,10 @@ import initialize from './initialization';
 import showStake from './show_stake';
 import { clearGermesData } from './bookmakerApi';
 
+window.alert = (message: string): void => {
+  log(`Перехваченный алерт: ${message}`);
+};
+
 worker.SetCallBacks(
   log,
   getStakeInfo,
@@ -34,6 +38,10 @@ clearGermesData();
     showStake();
   } else if (!worker.IsShowStake) {
     worker.SetSessionData(`${window.germesData.bookmakerName}.ShowStake`, '0');
+    worker.SetSessionData(
+      `${window.germesData.bookmakerName}.TransitionToEventPage`,
+      '0'
+    );
     log('Загрузка страницы с авторизацией', 'steelblue');
     initialize();
   } else {

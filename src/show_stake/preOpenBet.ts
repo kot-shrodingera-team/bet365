@@ -1,6 +1,5 @@
 import {
   awaiter,
-  checkBookerHost,
   getElement,
   getWorkerParameter,
   log,
@@ -10,64 +9,59 @@ import {
   NewUrlError,
 } from '@kot-shrodingera-team/germes-utils/errors';
 import { accountLimited, checkCashOutEnabled } from './helpers/accountChecks';
-import checkAuth, { authStateReady } from '../stake_info/checkAuth';
-import { balanceReady, updateBalance } from '../stake_info/getBalance';
-import clearCoupon from './clearCoupon';
 import checkCurrentLanguage from './helpers/checkCurrentLanguage';
 
-const preCheck = async (): Promise<void> => {
-  if (!checkBookerHost()) {
-    log('Открыта не страница конторы (или зеркала)', 'crimson');
-    window.location.href = new URL(worker.BookmakerMainUrl).href;
-    throw new NewUrlError('Открываем страницу БК');
-  }
+const preOpenBet = async (): Promise<void> => {
+  /* ======================================================================== */
+  /*                           Проверка загрузки API                          */
+  /* ======================================================================== */
 
   const locatorLoaded = await awaiter(
-    () => typeof Locator !== 'undefined',
+    () =>
+      typeof BetSlipLocator !== 'undefined' &&
+      typeof ns_favouriteslib_ui !== 'undefined',
     10000
   );
   if (!locatorLoaded) {
-    throw new JsFailError('API не загрузилось');
-  }
-
-  if (typeof ns_favouriteslib_ui === 'undefined') {
     window.location.href = new URL('/#/IP/', worker.BookmakerMainUrl).href;
     throw new NewUrlError('Страница не догрузилась. Перезагружаем');
   }
 
-  await authStateReady();
-  worker.Islogin = checkAuth();
-  worker.JSLogined();
-  if (!worker.Islogin) {
-    throw new JsFailError('Нет авторизации');
-  }
-  log('Есть авторизация', 'steelblue');
-  await balanceReady();
-  updateBalance();
+  /* ======================================================================== */
+  /*                         Проверка языка и кэшаута                         */
+  /* ======================================================================== */
 
   if (
     !getWorkerParameter('fakeAuth') &&
     !getWorkerParameter('disableAccountChecks')
   ) {
-    const currentLanguageCheck = await checkCurrentLanguage();
-    if (currentLanguageCheck === 0) {
-      throw new JsFailError('Проверка языка не прошла');
+    if (!getWorkerParameter('disableLanguageCheck')) {
+      const currentLanguageCheck = await checkCurrentLanguage();
+      if (currentLanguageCheck === 0) {
+        throw new JsFailError('Проверка языка не прошла');
+      }
+      if (currentLanguageCheck === -1) {
+        throw new NewUrlError('Переключаем язык на английский');
+      }
+      log('Проверка языка прошла', 'steelblue');
     }
-    if (currentLanguageCheck === -1) {
-      throw new NewUrlError('Переключаем язык на английский');
-    }
-    log('Проверка языка прошла', 'steelblue');
 
-    const cashOutEnabled = await checkCashOutEnabled();
-    if (cashOutEnabled === 0) {
-      log('Не удалось определить порезку аккаунта', 'steelblue');
-    } else if (cashOutEnabled === -1) {
-      accountLimited();
-      if (worker.PauseOnLimitedAccount) {
-        throw new JsFailError();
+    if (!getWorkerParameter('disableCashOutCheck')) {
+      const cashOutEnabled = await checkCashOutEnabled();
+      if (cashOutEnabled === 0) {
+        log('Не удалось определить порезку аккаунта', 'steelblue');
+      } else if (cashOutEnabled === -1) {
+        accountLimited();
+        if (worker.PauseOnLimitedAccount) {
+          throw new JsFailError();
+        }
       }
     }
   }
+
+  /* ======================================================================== */
+  /*                    Проверка открытого раздела In-Play                    */
+  /* ======================================================================== */
 
   if (!window.location.hash.startsWith('#/IP/')) {
     log('Открыт другой раздел Bet365. Переходим на In-Play', 'steelblue');
@@ -124,10 +118,21 @@ const preCheck = async (): Promise<void> => {
     remainLoggedInButton.click();
   }
 
-  const couponCleared = await clearCoupon();
-  if (!couponCleared) {
-    throw new JsFailError('Не удалось очистить купон');
+  const lastLoginButton = document.querySelector<HTMLElement>(
+    '.llm-LastLoginModule_Button'
+  );
+  if (lastLoginButton) {
+    log('Нажимаем кнопку "Continue" Last Login', 'orange');
+    lastLoginButton.click();
+  }
+
+  const pushBetDialogOkButton = document.querySelector<HTMLElement>(
+    '.bil-BetslipPushBetDialog_OkayButton'
+  );
+  if (pushBetDialogOkButton) {
+    log('Нажимаем кнопку "OK" PushBetDialog', 'orange');
+    pushBetDialogOkButton.click();
   }
 };
 
-export default preCheck;
+export default preOpenBet;

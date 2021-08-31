@@ -1,5 +1,9 @@
 const getSiteCurrency = (): string => {
-  if (!Locator || !Locator.user || !Locator.user.currencyCode) {
+  if (
+    typeof Locator === 'undefined' ||
+    !Locator.user ||
+    !Locator.user.currencyCode
+  ) {
     return 'Unknown';
   }
   const { currencyCode } = Locator.user;

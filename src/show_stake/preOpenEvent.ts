@@ -46,9 +46,6 @@ const preOpenEvent = async (): Promise<void> => {
     );
   }
 
-  const siteCurrency = getSiteCurrency();
-  checkCurrency(siteCurrency);
-
   /* ======================================================================== */
   /*               Перезагрузка страницы перед открытием ставки               */
   /* ======================================================================== */
@@ -83,6 +80,9 @@ const preOpenEvent = async (): Promise<void> => {
   log('Есть авторизация', 'steelblue');
   await balanceReady();
   updateBalance();
+
+  const siteCurrency = getSiteCurrency();
+  checkCurrency(siteCurrency);
 };
 
 export default preOpenEvent;

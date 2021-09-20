@@ -315,10 +315,15 @@ const asyncCheck = async () => {
         const checkMyBetsRegex =
           /Please check My Bets for confirmation that your bet has been successfully placed./i;
         if (checkMyBetsRegex.test(placeBetErrorText)) {
+          const dontInformCheckMyBetsError = getWorkerParameter(
+            'DontInformCheckMyBetsError'
+          );
           machine.end = true;
           checkCouponLoadingError({
             botMessage: 'Check My Bets',
-            informMessage: placeBetErrorText,
+            ...(dontInformCheckMyBetsError
+              ? {}
+              : { informMessage: placeBetErrorText }),
             reopen: {
               openBet,
             },

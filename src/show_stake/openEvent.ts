@@ -10,7 +10,7 @@ import {
   JsFailError,
   NewUrlError,
 } from '@kot-shrodingera-team/germes-utils/errors';
-import findEventInOverview from './helpers/findEventInOverview';
+import findEventInOverview from '../helpers/findEventInOverview';
 
 const openEvent = async (): Promise<void> => {
   /* ======================================================================== */
@@ -69,6 +69,17 @@ const openEvent = async (): Promise<void> => {
       }
     }
   }
+
+  /* ======================================================================== */
+  /*                            Переход на событие                            */
+  /* ======================================================================== */
+
+  // if (window.location.href === worker.EventUrl) {
+  //   log('Уже открыто нужное событие', 'steelblue');
+  //   return;
+  // }
+  // log(`${window.location.href} !== ${worker.EventUrl}`, 'white', true);
+  // window.location.href = worker.EventUrl;
 };
 
 export default openEvent;

@@ -32,9 +32,7 @@ const checkCurrentLanguage = async (): Promise<number> => {
   }
   languageLabel.click();
   const languageOptions = [
-    ...document.querySelectorAll<HTMLElement>(
-      '.um-PreferenceDropDownContainer_ItemLabel'
-    ),
+    ...document.querySelectorAll<HTMLElement>('.um-PreferenceDropDownItem'),
   ];
   const englishLanguageOption = languageOptions.find(
     (option) => option.textContent.trim() === 'English'

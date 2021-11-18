@@ -3,6 +3,14 @@ declare global {
   const BetSlipLocator: BetSlipLocator;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const ns_favouriteslib_ui: unknown;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const ns_mybetssubscriptionlib: {
+    MyBetsSubscriptionsManager: {
+      GetInstance: () => {
+        closeBetsEnabled: boolean;
+      };
+    };
+  };
 
   interface Bet365Bet {
     ConstructString: string;
@@ -28,6 +36,12 @@ declare global {
       };
       currencyCode: string;
     };
+    treeLookup: {
+      getReference: (id: string) => unknown;
+    };
+    subscriptionManager: {
+      subscribe: (eventId: string) => unknown;
+    };
   }
 
   interface BetSlipLocator {
@@ -38,6 +52,14 @@ declare global {
       betslip: {
         activeModule: {
           quickBetslipMoveToStandard: () => void;
+          slip: {
+            footer: {
+              model: {
+                acceptChanges: () => unknown;
+                placeBet: () => unknown;
+              };
+            };
+          };
         };
       };
     };
@@ -79,7 +101,10 @@ export const clearGermesData = (): void => {
     manualStakeEnabled: undefined,
 
     acceptChangesDelayStart: undefined,
-    referredBetData: undefined,
+    referredBetData: {
+      placeNowValue: undefined,
+      referredValue: undefined,
+    },
     resultCoefficient: undefined,
     prevLastBet: undefined,
   };

@@ -4,11 +4,11 @@ import {
   ri,
   text,
 } from '@kot-shrodingera-team/germes-utils';
-import getSiteTeamNames from '../show_stake/helpers/checkBet/getSiteTeamNames';
+import getSiteTeamNames from '../helpers/checkBet/getSiteTeamNames';
 import {
   formatParameterRegex,
   getHandicapScoreOffset,
-} from '../show_stake/helpers/checkBet/util';
+} from '../helpers/checkBet/util';
 
 export const parseParameter = (parameter: string): number => {
   const singleParameterRegex = /^[+-]?\d+(?:\.\d+)?$/;
@@ -64,7 +64,7 @@ const getParameter = (): number => {
   );
 
   if (betslipHandicapElement) {
-    log('Есть отдельный элемент параметра', 'white', true);
+    // log('Есть отдельный элемент параметра', 'cadetblue', true);
     const betslipHandicap = text(betslipHandicapElement);
     if (
       betslipHandicap &&

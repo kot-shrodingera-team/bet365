@@ -1,8 +1,8 @@
 import '@kot-shrodingera-team/worker-declaration/workerCheck';
-import { log } from '@kot-shrodingera-team/germes-utils';
+import { log, timeString } from '@kot-shrodingera-team/germes-utils';
 import getStakeInfo from './worker_callbacks/getStakeInfo';
 import setStakeSum from './worker_callbacks/setStakeSum';
-import doStake from './worker_callbacks/doStake';
+// import doStake from './worker_callbacks/doStake';
 import checkCouponLoading from './worker_callbacks/checkCouponLoading';
 import checkStakeStatus from './worker_callbacks/checkStakeStatus';
 import afterSuccesfulStake from './worker_callbacks/afterSuccesfulStake';
@@ -19,7 +19,16 @@ worker.SetCallBacks(
   log,
   getStakeInfo,
   setStakeSum,
-  doStake,
+  () => {
+    window.germesData.doStakeTime = new Date();
+    log(
+      `Время ставки: ${timeString(window.germesData.doStakeTime)}`,
+      'steelblue'
+    );
+    window.germesData.stopUpdateManualData = true;
+    window.germesData.betProcessingStep = 'beforeStart';
+    return true;
+  },
   checkCouponLoading,
   checkStakeStatus,
   afterSuccesfulStake

@@ -1,14 +1,16 @@
 import {
+  // awaiter,
   getElement,
   getWorkerParameter,
   log,
   repeatingOpenBet,
+  // sleep,
   text,
 } from '@kot-shrodingera-team/germes-utils';
 import { JsFailError } from '@kot-shrodingera-team/germes-utils/errors';
 import getStakeCount from '../stake_info/getStakeCount';
 import clearCoupon from './clearCoupon';
-import changeToStandardBetslip from './helpers/changeToStandardBetslip';
+import changeToStandardBetslip from '../helpers/changeToStandardBetslip';
 
 const openBet = async (): Promise<void> => {
   /* ======================================================================== */
@@ -24,6 +26,7 @@ const openBet = async (): Promise<void> => {
   /*                      Формирование данных для поиска                      */
   /* ======================================================================== */
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { betId, fi, od, zw } = (() => {
     if (worker.BetId.startsWith('{')) {
       return JSON.parse(worker.BetId);
@@ -59,6 +62,33 @@ const openBet = async (): Promise<void> => {
   };
 
   /* ======================================================================== */
+  /*                               Поиск ставки                               */
+  /* ======================================================================== */
+
+  // const checkedBets = <HTMLElement[]>[];
+  // const bet = await awaiter(() => {
+  //   const bets = [
+  //     ...document.querySelectorAll<HTMLElement>('.gl-Participant_General'),
+  //   ];
+  //   return bets.find((_bet) => {
+  //     if (checkedBets.includes(_bet)) {
+  //       return null;
+  //     }
+  //     checkedBets.push(_bet);
+  //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //     const testZW = (<any>_bet)?.wrapper?.twinEmphasizedHandlerType;
+  //     return testZW === zw;
+  //   });
+  // });
+  // if (!bet) {
+  //   throw new JsFailError('Ставка не найдена');
+  // }
+
+  // if ([...bet.classList].some((className) => /_Suspended$/i.test(className))) {
+  //   throw new JsFailError('Ставка недоступна');
+  // }
+
+  /* ======================================================================== */
   /*           Открытие ставки, проверка, что ставка попала в купон           */
   /* ======================================================================== */
 
@@ -72,6 +102,7 @@ const openBet = async (): Promise<void> => {
       getSportType,
       getCastCode,
     });
+    // bet.click();
   };
   await repeatingOpenBet(openingAction, getStakeCount, 5, 1000, 50);
 
@@ -101,15 +132,15 @@ const openBet = async (): Promise<void> => {
   /*                      Переключение мобильного купона                      */
   /* ======================================================================== */
 
-  const quickBetslipSelector = '.bss-BetslipStandardModule_QuickBetExpanded';
+  const qbsBetTitleSelector = '.qbs-NormalBetItem_Title';
   const eventNameSelector = '.bss-NormalBetItem_FixtureDescription';
 
   await Promise.race([
     getElement(eventNameSelector),
-    getElement(quickBetslipSelector),
+    getElement(qbsBetTitleSelector),
   ]);
-  const qbsStakeInput = document.querySelector(quickBetslipSelector);
-  if (qbsStakeInput) {
+  const qbsBetTitle = document.querySelector(qbsBetTitleSelector);
+  if (qbsBetTitle) {
     log('Мобильный купон. Переключаем на стандартный', 'orange');
     const changed = await changeToStandardBetslip();
     if (!changed) {

@@ -43,6 +43,11 @@ const preCheck = (): boolean => {
   return true;
 };
 
+const apiMethod = (): boolean => {
+  // BetSlipLocator.betSlipManager.betslip.activeModule.slip.footer.model.placeBet();
+  return true;
+};
+
 // const postCheck = (): boolean => {
 //   return true;
 // };
@@ -50,6 +55,7 @@ const preCheck = (): boolean => {
 const doStake = doStakeGenerator({
   preCheck,
   doStakeButtonSelector: '.bss-PlaceBetButton',
+  apiMethod,
   // errorClasses: [
   //   {
   //     className: '',

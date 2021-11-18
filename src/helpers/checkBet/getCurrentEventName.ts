@@ -1,6 +1,6 @@
 import { log } from '@kot-shrodingera-team/germes-utils';
 
-type TeamNames = { teamOne: string; teamTwo: string };
+// type TeamNames = { teamOne: string; teamTwo: string };
 
 const getCurrentEventName = (): string => {
   const eventNameElement = document.querySelector(

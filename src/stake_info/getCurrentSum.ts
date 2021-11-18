@@ -29,7 +29,7 @@ const currentSumOptions: StakeInfoValueOptions = {
     // matchRegex: /(\d+(?:\.\d+)?)/,
     errorValue: 0,
   },
-  zeroValues: ['Stake', 'Puntata'],
+  zeroValues: ['Stake', 'Puntata', ''],
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   // modifyValue: (value: number, extractType: string) => value,
   // disableLog: false,

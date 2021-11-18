@@ -1,9 +1,6 @@
 import { getWorkerParameter } from '@kot-shrodingera-team/germes-utils';
-import {
-  checkCashOutEnabled,
-  accountLimited,
-} from '../show_stake/helpers/accountChecks';
-import checkCurrentLanguage from '../show_stake/helpers/checkCurrentLanguage';
+import { checkAccountLimited, accountLimited } from '../helpers/accountChecks';
+import checkCurrentLanguage from '../helpers/checkCurrentLanguage';
 
 const afterSuccesfulLogin = async (): Promise<void> => {
   if (
@@ -14,7 +11,7 @@ const afterSuccesfulLogin = async (): Promise<void> => {
       await checkCurrentLanguage();
     }
     if (!getWorkerParameter('disableCashOutCheck')) {
-      const cashOutEnabled = await checkCashOutEnabled();
+      const cashOutEnabled = await checkAccountLimited();
       if (cashOutEnabled === 0) {
         return;
       }

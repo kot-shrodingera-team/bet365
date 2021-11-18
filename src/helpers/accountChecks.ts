@@ -1,4 +1,4 @@
-import { getElement, log } from '@kot-shrodingera-team/germes-utils';
+import { awaiter, getElement, log } from '@kot-shrodingera-team/germes-utils';
 
 export const checkCashOutEnabled = async (timeout = 5000): Promise<number> => {
   window.location.hash = '#/MB/';
@@ -30,6 +30,34 @@ export const checkCashOutEnabled = async (timeout = 5000): Promise<number> => {
   const cashOutEnabled = ![...cashOutFilterButton.classList].includes('Hidden');
   window.location.hash = '#/IP/';
   return cashOutEnabled ? 1 : -1;
+};
+
+export const checkAccountLimited = async (): Promise<number> => {
+  if (
+    typeof ns_mybetssubscriptionlib !== 'undefined' &&
+    ns_mybetssubscriptionlib.MyBetsSubscriptionsManager &&
+    ns_mybetssubscriptionlib.MyBetsSubscriptionsManager.GetInstance &&
+    ns_mybetssubscriptionlib.MyBetsSubscriptionsManager.GetInstance()
+  ) {
+    log('Проверка пореза по API', 'darksalmon', true);
+    const checkReady = await awaiter(
+      () =>
+        typeof ns_mybetssubscriptionlib.MyBetsSubscriptionsManager.GetInstance()
+          .closeBetsEnabled !== 'undefined'
+    );
+    if (checkReady) {
+      const { closeBetsEnabled } =
+        ns_mybetssubscriptionlib.MyBetsSubscriptionsManager.GetInstance();
+      if (closeBetsEnabled) {
+        log('Пореза нет', 'cadetblue', true);
+      } else {
+        log('Есть порез', 'cadetblue', true);
+      }
+      return closeBetsEnabled ? 1 : -1;
+    }
+  }
+  log('Не удалось проверить порез аккаунта. Проверяем CashOut', 'orange');
+  return checkCashOutEnabled();
 };
 
 export const accountRestricted = (): void => {

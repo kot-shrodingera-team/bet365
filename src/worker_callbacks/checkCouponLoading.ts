@@ -23,6 +23,7 @@ import {
 } from '../helpers/accountChecks';
 import { updateMaximumStake } from '../stake_info/getMaximumStake';
 import checkAuth from '../stake_info/checkAuth';
+import setStakeSum, { clearStakeSum } from './setStakeSum';
 
 const loaderSelector = '.bss-ProcessingButton';
 const referBetSelector = '.bss-ReferBetConfirmation';
@@ -327,6 +328,10 @@ const asyncCheck = async () => {
           return;
         }
         if (pleaseEnterAStakeErrorRegex.test(errorText)) {
+          log('Перевбиваем сумму ставки', 'orange');
+          clearStakeSum();
+          setStakeSum(worker.StakeInfo.Summ);
+          await sleep(500);
           betProcessingError(machine);
           return;
         }

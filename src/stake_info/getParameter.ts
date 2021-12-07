@@ -37,8 +37,8 @@ const getParameter = (): number => {
     return parameter;
   }
 
-  const marketNameSelector = '.bss-NormalBetItem_Market';
-  const betNameSelector = '.bss-NormalBetItem_Title';
+  const marketNameSelector = '.lbs-NormalBetItem_Market';
+  const betNameSelector = '.lbs-NormalBetItem_Title';
 
   const marketNameElement = document.querySelector(marketNameSelector);
   const betNameElement = document.querySelector(betNameSelector);
@@ -60,7 +60,7 @@ const getParameter = (): number => {
   }
 
   const betslipHandicapElement = document.querySelector(
-    '.bss-NormalBetItem_Handicap'
+    '.lbs-NormalBetItem_Handicap'
   );
 
   if (betslipHandicapElement) {

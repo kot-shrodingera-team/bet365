@@ -2,7 +2,9 @@ import { getElement } from '@kot-shrodingera-team/germes-utils';
 
 const changeToStandardBetslip = async (): Promise<boolean> => {
   BetSlipLocator.betSlipManager.betslip.activeModule.quickBetslipMoveToStandard();
-  const expandedBetslip = await getElement('.lbs-StandardBetslip');
+  const expandedBetslip = await getElement(
+    '.bss-BetslipStandardModule_Expanded'
+  );
   if (!expandedBetslip) {
     return false;
   }

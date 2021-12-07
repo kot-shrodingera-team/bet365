@@ -6,10 +6,10 @@ import {
 } from '@kot-shrodingera-team/germes-utils';
 
 const getPlacedBetCoefficient = async (): Promise<void> => {
-  const eventNameSelector = '.lbs-NormalBetItem_FixtureDescription';
-  const marketNameSelector = '.lbs-NormalBetItem_Market';
-  const betNameSelector = '.lbs-NormalBetItem_Title';
-  const betHandicapSelector = '.lbs-NormalBetItem_Handicap';
+  const eventNameSelector = '.bss-NormalBetItem_FixtureDescription';
+  const marketNameSelector = '.bss-NormalBetItem_Market';
+  const betNameSelector = '.bss-NormalBetItem_Title';
+  const betHandicapSelector = '.bss-NormalBetItem_Handicap';
 
   const eventNameElement = document.querySelector(eventNameSelector);
   if (!eventNameElement) {
@@ -41,7 +41,7 @@ const getPlacedBetCoefficient = async (): Promise<void> => {
   log(`Результат:\n${eventName}\n${marketName}\n${betName}`, 'steelblue');
 
   const betReferenceElement = document.querySelector(
-    '.lbs-ReceiptContent_BetRef'
+    '.bss-ReceiptContent_BetRef'
   );
   if (!betReferenceElement) {
     log('Не найден Bet Ref успешной ставки', 'crimson');

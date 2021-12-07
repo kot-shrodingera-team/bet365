@@ -44,7 +44,7 @@ export const updateMaximumStake = (): void => {
   const unknownMaximumErrorRegex = /^Your stake exceeds the maximum allowed$/i;
 
   const errorMessageElement = document.querySelector(
-    '.lbs-Footer_MessageBody, .bsi-FooterIT_MessageBody'
+    '.bss-Footer_MessageBody, .bsi-FooterIT_MessageBody'
   );
   if (!errorMessageElement) {
     log('Не найдена ошибка максимума в купоне', 'crimson');
@@ -70,7 +70,7 @@ export const updateMaximumStake = (): void => {
   if (unknownMaximumMatch) {
     log('Нет максимума в тексте ошибки', 'steelblue');
     const maximumMessageElement = document.querySelector(
-      '.lbs-NormalBetItem_MessageBody'
+      '.bss-NormalBetItem_MessageBody'
     );
     if (!maximumMessageElement) {
       log(

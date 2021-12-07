@@ -15,7 +15,7 @@ const preCheck = (): boolean => {
 
   const acceptButton = document.querySelector('.bs-AcceptButton');
   const suspendedStake = document.querySelector(
-    '.lbs-NormalBetItem.lbs-NormalBetItem_Suspended'
+    '.bss-NormalBetItem.bss-NormalBetItem_Suspended'
   );
 
   if (suspendedStake) {
@@ -35,10 +35,10 @@ const checkStakeEnabled = checkStakeEnabledGenerator({
   preCheck,
   getStakeCount,
   betCheck: {
-    selector: '.lbs-NormalBetItem',
+    selector: '.bss-NormalBetItem',
     // errorClasses: [
     //   {
-    //     className: 'lbs-NormalBetItem_Suspended',
+    //     className: 'bss-NormalBetItem_Suspended',
     //     message: 'Suspended',
     //   },
     // ],

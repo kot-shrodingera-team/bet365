@@ -25,14 +25,14 @@ import { updateMaximumStake } from '../stake_info/getMaximumStake';
 import checkAuth from '../stake_info/checkAuth';
 import setStakeSum, { clearStakeSum } from './setStakeSum';
 
-const loaderSelector = '.lbs-ProcessingButton';
-const referBetSelector = '.lbs-ReferBetConfirmation';
+const loaderSelector = '.bss-ProcessingButton';
+const referBetSelector = '.bss-ReferBetConfirmation';
 export const errorSelector =
-  '.lbs-Footer_MessageBody, .bsi-FooterIT_MessageBody';
+  '.bss-Footer_MessageBody, .bsi-FooterIT_MessageBody';
 const placeBetErrorSelector = '.bs-PlaceBetErrorMessage_Contents';
 const acceptButtonSelector = '.bs-AcceptButton';
 const receiptTickSelector =
-  '.lbs-ReceiptContent_Tick, .lbs-StandardBetslip-receipt';
+  '.bss-ReceiptContent_Tick, .bss-StandardBetslip-receipt';
 
 const loaderNotAppearedTimeout =
   getWorkerParameter<number>('betProcessingStartDelay', 'number') || 1000;
@@ -127,10 +127,10 @@ const asyncCheck = async () => {
       entry: async (): Promise<void> => {
         log('Refer Bet Confirmation', 'steelblue');
         const placeNowValueSelector =
-          '.lbs-ReferBetConfirmation_PlaceNow .lbs-ReferBetConfirmation_Referred:nth-child(1) .lbs-ReferBetConfirmation_Referred-value';
+          '.bss-ReferBetConfirmation_PlaceNow .bss-ReferBetConfirmation_Referred:nth-child(1) .bss-ReferBetConfirmation_Referred-value';
         const referredValueSelector =
-          '.lbs-ReferBetConfirmation_PlaceNow .lbs-ReferBetConfirmation_Referred:nth-child(2) .lbs-ReferBetConfirmation_Referred-value';
-        const placeBetAndReferButtonSelector = '.lbs-PlaceBetReferButton_Text';
+          '.bss-ReferBetConfirmation_PlaceNow .bss-ReferBetConfirmation_Referred:nth-child(2) .bss-ReferBetConfirmation_Referred-value';
+        const placeBetAndReferButtonSelector = '.bss-PlaceBetReferButton_Text';
 
         log('Ждём появления данных', 'steelblue');
         sendTGBotMessage(
@@ -278,7 +278,7 @@ const asyncCheck = async () => {
         }
         if (oddsChangedRegex.test(errorText)) {
           const suspendedStake = document.querySelector(
-            '.lbs-NormalBetItem.lbs-NormalBetItem_Suspended'
+            '.bss-NormalBetItem.bss-NormalBetItem_Suspended'
           );
           if (suspendedStake) {
             log('Ставка недоступна', 'crimson');

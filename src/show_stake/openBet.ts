@@ -132,14 +132,14 @@ const openBet = async (): Promise<void> => {
   /*                      Переключение мобильного купона                      */
   /* ======================================================================== */
 
-  const quickBetBetslipSelector = '.lqb-QuickBetslip';
-  const eventNameSelector = '.lbs-NormalBetItem_FixtureDescription';
+  const qbsBetTitleSelector = '.qbs-NormalBetItem_Title';
+  const eventNameSelector = '.bss-NormalBetItem_FixtureDescription';
 
   await Promise.race([
     getElement(eventNameSelector),
-    getElement(quickBetBetslipSelector),
+    getElement(qbsBetTitleSelector),
   ]);
-  const qbsBetTitle = document.querySelector(quickBetBetslipSelector);
+  const qbsBetTitle = document.querySelector(qbsBetTitleSelector);
   if (qbsBetTitle) {
     log('Мобильный купон. Переключаем на стандартный', 'orange');
     const changed = await changeToStandardBetslip();
@@ -153,9 +153,9 @@ const openBet = async (): Promise<void> => {
   /*                    Вывод информации об открытой ставке                   */
   /* ======================================================================== */
 
-  const marketNameSelector = '.lbs-NormalBetItem_Market';
-  const betNameSelector = '.lbs-NormalBetItem_Title';
-  const betHandicapSelector = '.lbs-NormalBetItem_Handicap';
+  const marketNameSelector = '.bss-NormalBetItem_Market';
+  const betNameSelector = '.bss-NormalBetItem_Title';
+  const betHandicapSelector = '.bss-NormalBetItem_Handicap';
 
   const eventNameElement = document.querySelector(eventNameSelector);
   if (!eventNameElement) {
@@ -186,7 +186,7 @@ const openBet = async (): Promise<void> => {
       //   5000,
       //   50
       // );
-      const parameterLoaded = await getElement('.lbs-NormalBetItem_Handicap');
+      const parameterLoaded = await getElement('.bss-NormalBetItem_Handicap');
       if (!parameterLoaded) {
         throw new JsFailError('Не дождались появления параметра');
       }

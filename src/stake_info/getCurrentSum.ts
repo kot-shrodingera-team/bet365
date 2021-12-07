@@ -4,7 +4,7 @@ import getStakeInfoValueGenerator, {
 import { StakeInfoValueOptions } from '@kot-shrodingera-team/germes-generators/stake_info/types';
 import { getWorkerParameter } from '@kot-shrodingera-team/germes-utils';
 
-export const sumInputSelector = 'input.lbs-StakeBox_StakeValueInput';
+export const sumInputSelector = 'input.bss-StakeBox_StakeValueInput';
 
 const currentSumOptions: StakeInfoValueOptions = {
   name: 'currentSum',

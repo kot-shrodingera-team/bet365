@@ -45,7 +45,7 @@ const afterSuccesfulStake = (): void => {
     log('Коеффициент не изменился', 'lightblue');
     // if (getWorkerParameter('sendBetRef')) {
     //   const betReferenceElement = document.querySelector(
-    //     '.lbs-ReceiptContent_BetRef'
+    //     '.bss-ReceiptContent_BetRef'
     //   );
     //   if (!betReferenceElement) {
     //     log('Не найден Bet Reference', 'crimson');

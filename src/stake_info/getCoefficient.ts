@@ -3,7 +3,7 @@ import getStakeInfoValueGenerator, {
 } from '@kot-shrodingera-team/germes-generators/stake_info/getStakeInfoValue';
 import { StakeInfoValueOptions } from '@kot-shrodingera-team/germes-generators/stake_info/types';
 
-export const coefficientSelector = '.lbs-NormalBetItem .lbl-OddsLabel';
+export const coefficientSelector = '.bss-NormalBetItem .bs-OddsLabel';
 
 const coefficientOptions: StakeInfoValueOptions = {
   name: 'coefficient',

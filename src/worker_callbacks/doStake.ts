@@ -54,7 +54,7 @@ const apiMethod = (): boolean => {
 
 const doStake = doStakeGenerator({
   preCheck,
-  doStakeButtonSelector: '.lbs-PlaceBetButton',
+  doStakeButtonSelector: '.bss-PlaceBetButton',
   apiMethod,
   // errorClasses: [
   //   {

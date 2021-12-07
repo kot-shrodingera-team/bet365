@@ -1,6 +1,6 @@
 {
   "name": "@kot-shrodingera-team/bet365",
-  "version": "1.1.13",
+  "version": "1.1.14",
   "dependencies": {
     "@kot-shrodingera-team/germes-generators": "1.1.28",
     "@kot-shrodingera-team/germes-utils": "1.0.72",

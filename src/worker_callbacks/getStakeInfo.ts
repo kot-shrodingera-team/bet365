@@ -18,12 +18,12 @@ import getCurrentSum from '../stake_info/getCurrentSum';
 //   ) {
 //     return false;
 //   }
-//   const bet = document.querySelector('.bss-NormalBetItem');
+//   const bet = document.querySelector('.lbs-NormalBetItem');
 //   if (!bet) {
 //     log('Не найдена ставка в купоне', 'crimson');
 //     return true;
 //   }
-//   if (bet.classList.contains('bss-NormalBetItem_Suspended')) {
+//   if (bet.classList.contains('lbs-NormalBetItem_Suspended')) {
 //     log('Ставка в купоне недоступна', 'crimson');
 //     return true;
 //   }

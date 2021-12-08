@@ -4,7 +4,7 @@ import { log } from '@kot-shrodingera-team/germes-utils';
 
 const getCurrentEventName = (): string => {
   const eventNameElement = document.querySelector(
-    '.bss-NormalBetItem_FixtureDescription'
+    '.lbs-NormalBetItem_FixtureDescription'
   );
   if (!eventNameElement) {
     log(
